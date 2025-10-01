@@ -1,11 +1,15 @@
 #ifndef PLAYER_H
 #define PLAYER_H
+#include <raylib.h>
 
 struct Player{
-    float x,y;
+    float x,y,spawnRadius;
+    Vector2 movementVelocity{0,0};
 };
 
-Player CreatePlayer();
+Player CreatePlayer(float spawnX,float spawnY, float spawnRadius);
+
+Vector2 GetPlayerLocAsVector2(const Player &player);
 
 void DrawPlayer(const Player &player);
 
