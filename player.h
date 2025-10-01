@@ -11,6 +11,8 @@ Player CreatePlayer(float spawnX,float spawnY, float spawnRadius);
 
 Vector2 GetPlayerLocAsVector2(const Player &player);
 
-void DrawPlayer(const Player &player);
+void HandlePlayerVelocity(Player &player);
+
+void DrawPlayer(Player &player);
 
 #endif

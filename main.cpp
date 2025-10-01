@@ -37,7 +37,7 @@ Rectangle CreateObstacle(ScreenSide side,int width,int height){
 }
 
 int main(){
-    //Gust up variables
+    int drag;
 
     player = CreatePlayer(200,200,10);
 
@@ -45,36 +45,39 @@ int main(){
     Rectangle rec2 = CreateObstacle(Middle, 100, 10);
     Rectangle rec3 = CreateObstacle(Right, 100, 10);
     
-    bool isHoldingDown = false;
+    bool isMovingUp = false;
+    bool isMovingDown = false;
+    bool isGusting = false;
 
     InitWindow(SCREEN_WIDTH,SCREEN_HEIGHT,"Drop");
     SetTargetFPS(60);
 
-
     while(!WindowShouldClose()){
-        player.movementVelocity.y += gravity * GetFrameTime() : player.movementVelocity.y;
-        if(player.movementVelocity.y > 2 && !isHoldingDown){
-            player.movementVelocity.y = 2;
-        }else if(player.movementVelocity.y > 5 && isHoldingDown){
-            player.movementVelocity.y = 5;
-        }
-        
-        isHoldingDown = false;
-
-        if(IsKeyDown(KEY_W)) {
-            player.y -= 5; 
-        }
-        if(IsKeyDown(KEY_A)) player.x -= 5;
-        if(IsKeyDown(KEY_S)) {
-            player.y += 5;
-            isHoldingDown = true;
-        }
-        if(IsKeyDown(KEY_D)) player.x += 5;
-
-        //cout << y << endl;
+        drag = 2 * player.movementVelocity.y;
         cout << player.movementVelocity.y << endl;
 
-        player.y += player.movementVelocity.y;
+        if(IsKeyDown(KEY_W)){
+            player.y -= 2;
+
+            isMovingUp = true;
+            isMovingDown = false;
+        }else if(IsKeyDown(KEY_S)){
+            isMovingDown = true;
+            isMovingUp = false;
+        }
+
+        if(IsKeyDown(KEY_A)) player.x -= 2;
+        if(IsKeyDown(KEY_D)) player.x += 2;
+
+        if(isMovingDown){
+            player.movementVelocity.y += 0.5;
+        }
+
+        if(isMovingUp){
+            player.movementVelocity.y -= 0.5;
+        }
+
+        HandlePlayerVelocity(player);
 
         rec.y -= 10;
         rec2.y -= 10;

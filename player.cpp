@@ -10,6 +10,31 @@ Vector2 GetPlayerLocAsVector2(const Player &player){
     return vec2;
 }
 
-void DrawPlayer(const Player &player) {
+void HandlePlayerVelocity(Player &player){
+    //Moving right
+    if(player.movementVelocity.x > 2){
+        player.movementVelocity.x = 2;
+    }
+
+    //Moving down
+    if(player.movementVelocity.y > 5){
+        player.movementVelocity.y = 2;
+    }
+
+    //Moving left
+    if(player.movementVelocity.x < -2){
+        player.movementVelocity.x = -2;
+    }
+
+    //Moving up 
+    if(player.movementVelocity.y < 0){
+        player.movementVelocity.y = 0;
+    }
+
+    player.x += player.movementVelocity.x;
+    player.y += player.movementVelocity.y;
+}
+
+void DrawPlayer(Player &player) {
     DrawCircle((int)player.x, (int)player.y, (int)player.spawnRadius, WHITE);
 }
