@@ -12,6 +12,7 @@
 using namespace std;
 
 Player player;
+int score;
 
 int main(){
     player = CreatePlayer(200,200,10);
@@ -29,34 +30,50 @@ int main(){
 
     Obstacle* currentObstacle = GetObstacleFromQueue(obstacles, obstaclesInScene);
 
+    int frameCounter = 0;
+
     InitWindow(SCREEN_WIDTH,SCREEN_HEIGHT,"Drop");
-    SetTargetFPS(60);
+    SetTargetFPS(TARGET_FPS);
 
     while(!WindowShouldClose()){
+        frameCounter++;
+
+        //Ammend score every second 
+        if(frameCounter == TARGET_FPS){
+           frameCounter = 0; 
+
+           score += 1;
+        } 
 
         //if(IsKeyDown(KEY_W)) player.y -= 5;
         if(IsKeyDown(KEY_A)) player.x -= 5;
        // if(IsKeyDown(KEY_S)) player.y += 5;
         if(IsKeyDown(KEY_D)) player.x += 5;
 
-        /*for(int i = 0; i < GetRandomValue(1,3); i++){
-            
-        }*/
         if(CheckCollisionCircleRec(GetPlayerLocAsVector2(player),player.spawnRadius,currentObstacle->body)){
             cout << "HIT" << endl;
         }
-        /*
-        if(HasObstacleLeftScreen(*currentObstacle)){
+        
+        if(HasObstacleLeftScreen(*currentObstacle) && currentObstacle->hasEnteredScreen){
+            obstaclesInScene.erase(obstaclesInScene.begin() + currentObstacle->id);
+
+            if(obstacles.empty()){
+                obstacles.push(rec);
+            }
+
             currentObstacle = GetObstacleFromQueue(obstacles, obstaclesInScene);
-        }*/
+            cout << "Its has left the board type shih" << endl;
+        }
 
         UpdateAllObstacles(obstaclesInScene);
-        cout << currentObstacle->body.y << "||" << obstaclesInScene.back()->body.y << endl;
+
+        cout << obstaclesInScene.size() << endl;
  
         BeginDrawing();
             ClearBackground(BLUE);
             DrawPlayer(player);
             DrawRectangleRec(currentObstacle->body,RED);
+            DrawText(to_string(score).c_str(),10,0,100,GREEN);
         EndDrawing();
     }
  
