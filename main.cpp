@@ -4,6 +4,8 @@
 #include <raylib.h>
 #include <vector>
 #include <queue>
+#include <type_traits>
+#include <concepts>
 #include "player.h"
 #include "enums.h"
 #include "constants.h"
@@ -14,9 +16,24 @@ using namespace std;
 Player player;
 int score;
 
+float Clamp(float value,float min, float max){
+    if(value < min){
+        value = min;
+        return value;
+    }
+
+    if(value > max){
+        value = max;
+        return value;
+    }
+
+    return value;
+}
 
 void DrawBackDropScroll(Texture2D background, Vector2 &backdropLoc){
-    backdropLoc.y -= 10;
+    int playerFallingScrollOffset = Clamp(player.movementVelocity.y,-10,10);
+
+    backdropLoc.y -= 10 + player.movementVelocity.y;
 
     // Reset when the texture has fully scrolled out
     if (backdropLoc.y <= -SCREEN_HEIGHT) {
@@ -70,9 +87,14 @@ int main(){
        // if(IsKeyDown(KEY_S)) player.y += 5;
         if(IsKeyDown(KEY_D)) player.x += 5;
 
-        player.y += player.movementVelocity.y;
+        player.timeFallingDown += GetFrameTime();
 
-        player.movementVelocity.y *= GRAVITY;
+        cout << player.timeFallingDown <<  endl;
+
+        if(IsKeyDown(KEY_S)) player.movementVelocity.y = GRAVITY * player.timeFallingDown;
+        else if (player.movementVelocity.y > 1) player.movementVelocity.y *= -1;
+
+        player.y += Clamp(player.movementVelocity.y,-3,3);
 
         if(PlayerPosition::Top > player.y) player.y = PlayerPosition::Top;
         else if(PlayerPosition::Bottom < player.y) player.y = PlayerPosition::Bottom;

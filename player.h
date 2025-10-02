@@ -7,10 +7,11 @@
 struct Player{
     float x,y,spawnRadius;
     Vector2 movementVelocity{0,GRAVITY};
+    int weight = 5;
 
     PlayerPosition mapPos = Center;
 
-    int timeFallingDown = 0; //Time spent where the player is pressing to move down
+    float timeFallingDown = 0; //Time spent where the player is pressing to move down
 };
 
 Player CreatePlayer(float spawnX,float spawnY, float spawnRadius);
