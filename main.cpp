@@ -14,8 +14,25 @@ using namespace std;
 Player player;
 int score;
 
+
+void DrawBackDropScroll(Texture2D background, Vector2 &backdropLoc){
+    backdropLoc.y -= 10;
+
+    // Reset when the texture has fully scrolled out
+    if (backdropLoc.y <= -SCREEN_HEIGHT) {
+        backdropLoc.y = 0;
+    }
+
+    // Draw two textures: one at current position, one just below it
+    DrawTexture(background, backdropLoc.x, backdropLoc.y, { 150, 150, 150, 255 });
+    DrawTexture(background, backdropLoc.x, backdropLoc.y + SCREEN_HEIGHT, { 150, 150, 150, 255 });
+}
+
+
 int main(){
     player = CreatePlayer(200,200,10);
+
+    Vector2 backdropLoc = {0,0};
 
     queue<Obstacle> obstacles;
     vector<Obstacle*> obstaclesInScene;
@@ -34,6 +51,9 @@ int main(){
 
     InitWindow(SCREEN_WIDTH,SCREEN_HEIGHT,"Drop");
     SetTargetFPS(TARGET_FPS);
+    
+    Texture2D background = LoadTexture("backDrop.png");
+    
 
     while(!WindowShouldClose()){
         frameCounter++;
@@ -62,21 +82,21 @@ int main(){
             }
 
             currentObstacle = GetObstacleFromQueue(obstacles, obstaclesInScene);
-            cout << "Its has left the board type shih" << endl;
         }
 
         UpdateAllObstacles(obstaclesInScene);
 
-        cout << obstaclesInScene.size() << endl;
- 
         BeginDrawing();
-            ClearBackground(BLUE);
+            ClearBackground(RAYWHITE);
+            DrawBackDropScroll(background,backdropLoc);
+
             DrawPlayer(player);
             DrawRectangleRec(currentObstacle->body,RED);
             DrawText(to_string(score).c_str(),10,0,100,GREEN);
         EndDrawing();
     }
- 
+    
+    UnloadTexture(background);
     CloseWindow();
     return 0;
 }
