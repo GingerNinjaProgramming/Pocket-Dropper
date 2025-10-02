@@ -70,6 +70,13 @@ int main(){
        // if(IsKeyDown(KEY_S)) player.y += 5;
         if(IsKeyDown(KEY_D)) player.x += 5;
 
+        player.y += player.movementVelocity.y;
+
+        player.movementVelocity.y *= GRAVITY;
+
+        if(PlayerPosition::Top > player.y) player.y = PlayerPosition::Top;
+        else if(PlayerPosition::Bottom < player.y) player.y = PlayerPosition::Bottom;
+
         if(CheckCollisionCircleRec(GetPlayerLocAsVector2(player),player.spawnRadius,currentObstacle->body)){
             cout << "HIT" << endl;
         }
