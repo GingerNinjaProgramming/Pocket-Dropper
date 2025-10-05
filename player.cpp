@@ -1,8 +1,8 @@
 #include "player.h"
 #include "raylib.h"
 
-Player CreatePlayer(float spawnX,float spawnY, float spawnRadius) {
-    return { spawnX, spawnY, spawnRadius};
+Player CreatePlayer(Texture2D sprite,float spawnX,float spawnY, float spawnRadius) {
+    return { sprite, spawnX, spawnY, spawnRadius};
 }
 
 Vector2 GetPlayerLocAsVector2(const Player &player){
@@ -11,5 +11,6 @@ Vector2 GetPlayerLocAsVector2(const Player &player){
 }
 
 void DrawPlayer(const Player &player) {
-    DrawCircle((int)player.x, (int)player.y, (int)player.spawnRadius, WHITE);
+    DrawTexture(player.sprite, (int)player.x, (int)player.y, WHITE);
 }
+

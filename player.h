@@ -5,6 +5,8 @@
 #include "enums.h"
 
 struct Player{
+    Texture2D sprite;
+
     float x,y,spawnRadius;
     Vector2 movementVelocity{0,0};
     int weight = 5;
@@ -16,7 +18,7 @@ struct Player{
 
 };
 
-Player CreatePlayer(float spawnX,float spawnY, float spawnRadius);
+Player CreatePlayer(Texture2D sprite,float spawnX,float spawnY, float spawnRadius);
 
 Vector2 GetPlayerLocAsVector2(const Player &player);
 

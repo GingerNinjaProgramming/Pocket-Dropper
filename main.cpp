@@ -10,6 +10,7 @@
 #include "enums.h"
 #include "constants.h"
 #include "obstacle.h"
+#include "projectile.h"
 
 using namespace std;
 
@@ -57,12 +58,12 @@ void DrawBackDropScroll(Texture2D background, Vector2 &backdropLoc){
 
 
 int main(){
-    player = CreatePlayer(200,200,10);
-
     Vector2 backdropLoc = {0,0};
 
     queue<Obstacle> obstacles;
     vector<Obstacle*> obstaclesInScene;
+
+    vector<Projectile*> projectiles;
 
     obstacles.push(CreateObstacle(Random, 100, 100));
 
@@ -73,6 +74,8 @@ int main(){
     InitWindow(SCREEN_WIDTH,SCREEN_HEIGHT,"Drop");
     SetTargetFPS(TARGET_FPS);
     
+
+    player = CreatePlayer(LoadTexture("Player.png"),200,200,10);
     Texture2D background = LoadTexture("backDrop.png");
     //Texture2D projectile = LoadTexture("Projectile_Nail.png");
 
@@ -90,6 +93,11 @@ int main(){
         if(IsKeyDown(KEY_A)) player.x -= 5;
        // if(IsKeyDown(KEY_S)) player.y += 5;
         if(IsKeyDown(KEY_D)) player.x += 5;
+
+        if(IsKeyPressed(KEY_SPACE)){
+            Projectile* newProjectile = new Projectile(CreateProjectile(player.x,player.y,10,LoadTexture("Pin.png")));
+            projectiles.push_back(newProjectile);
+        }
 
         player.timeFallingDown = Clamp(player.timeFallingDown + GetFrameTime(),1,player.timeFallingDown + GetFrameTime());
 
@@ -116,11 +124,25 @@ int main(){
 
         UpdateAllObstacles(obstaclesInScene,player);
 
+        for(auto& projectile : projectiles){
+            projectile->y += (projectile->speed);
+            ClampRef(projectile->y,player.y,SCREEN_HEIGHT);
+
+            for(const auto& obstacle : obstaclesInScene){
+                if(CheckCollisionCircleRec(GetPlayerLocAsVector2(player),player.spawnRadius,obstacle->body)){
+                    cout << "Projectile Hit" << endl;
+                }
+            }
+        }
+
         BeginDrawing();
             ClearBackground(RAYWHITE);
             DrawBackDropScroll(background,backdropLoc);
 
             DrawPlayer(player);
+            for(const auto& projectile : projectiles){
+                DrawTexture(projectile->sprite, (int)projectile->x, (int)projectile->y, WHITE);
+            }
             DrawRectangleRec(currentObstacle->body, RED);
             DrawText(to_string(score).c_str(),10,0,100,GREEN);
         EndDrawing();
