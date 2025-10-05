@@ -7,7 +7,7 @@
 struct Player{
     Texture2D sprite;
 
-    float x,y,spawnRadius;
+    float x,y;
     Vector2 movementVelocity{0,0};
     int weight = 5;
 
@@ -16,13 +16,16 @@ struct Player{
     float timeFallingDown = 0; //Time spent where the player is pressing to move down
     int maxFallingSpeed = 100;
 
+    bool isDashing = false;
+    Vector2 dashPulse{1,1};
+
 };
 
-Player CreatePlayer(Texture2D sprite,float spawnX,float spawnY, float spawnRadius);
+Player CreatePlayer(Texture2D sprite,float spawnX,float spawnY);
 
 Vector2 GetPlayerLocAsVector2(const Player &player);
 
 void DrawPlayer(const Player &player);
 
-
+void DoDash(Player &player);
 #endif
