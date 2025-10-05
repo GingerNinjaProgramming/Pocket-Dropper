@@ -94,7 +94,9 @@ int main(){
     //Texture2D projectile = LoadTexture("Projectile_Nail.png");
 
     Texture2D explosion = LoadTexture("Projectile_Nail.png");
-    SpriteSheet explosionSheet = CreateSpriteSheet(explosion, 16, 16, 2);
+    SpriteSheet explosionSheet = CreateSpriteSheet(explosion, 2, 1);
+
+    Rectangle plat = {100,100,100,100};
 
 
     while(!WindowShouldClose()){
@@ -105,8 +107,13 @@ int main(){
            score += 1;
         } 
 
-        if(IsKeyDown(KEY_A)) player.movementVelocity.x = -5;
-        if(IsKeyDown(KEY_D)) player.movementVelocity.x = 5;
+        explosionSheet.frameTimer += 1;
+
+        if(IsKeyDown(KEY_W) && player.movementVelocity.y > 40) player.fallingOffset += 1;
+        if(IsKeyDown(KEY_S)) player.movementVelocity.y -= 2;
+
+        if(IsKeyDown(KEY_A)) player.movementVelocity.x = -10;
+        if(IsKeyDown(KEY_D)) player.movementVelocity.x = 10;
 
         if(IsKeyPressed(KEY_LEFT_SHIFT)){
             DoDash(player);
@@ -118,7 +125,7 @@ int main(){
 
         player.timeFallingDown = Clamp(player.timeFallingDown + GetFrameTime(),1,player.timeFallingDown + GetFrameTime());
 
-        player.movementVelocity.y += GRAVITY * player.timeFallingDown;
+        player.movementVelocity.y = (GRAVITY * player.timeFallingDown) - player.fallingOffset;
         ClampRef(player.movementVelocity.y,0,player.maxFallingSpeed);
 
         //cout << player.movementVelocity.y << endl;
@@ -176,7 +183,6 @@ int main(){
             DrawTexture(scoreBoard, 10, 0, WHITE);
             DrawText(to_string(score).c_str(), 10 + (scoreBoard.width / 2 - 10), 0 + (scoreBoard.height - 40), 30, GREEN);
 
-            DrawTextureRec(explosionSheet.texture,explosionSheet.frames.front(),{player.x + 10,player.y + 10},WHITE);
         EndDrawing();
     }
     

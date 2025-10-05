@@ -16,6 +16,8 @@ struct Player{
     float timeFallingDown = 0; //Time spent where the player is pressing to move down
     int maxFallingSpeed = 100;
 
+    int fallingOffset = 0;
+
     bool isDashing = false;
     Vector2 dashPulse{1,1};
 

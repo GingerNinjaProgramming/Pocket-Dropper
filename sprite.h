@@ -2,16 +2,19 @@
 #define SPRITE_H
 
 #include <raylib.h>
-#include <queue>
+#include <vector>
 
 
 struct SpriteSheet{
     Texture2D texture;
-    std::queue<Rectangle> frames;
+    std::vector<Rectangle> frames;
+
+    int currentFrame;
+    float frameTimer = 0;
 };
 
-SpriteSheet CreateSpriteSheet(Texture2D sheet, int frameWidth, int frameHeight, int frameCount);
+SpriteSheet CreateSpriteSheet(Texture2D sheet, int frameCount, int timeBetweenFrames);
 
-
+void DrawSpriteFrame(SpriteSheet &spriteSheet, Vector2 position);
 
 #endif 
