@@ -4,6 +4,8 @@
 #include <raylib.h>
 #include <vector>
 #include <queue>
+#include <type_traits>
+#include <concepts>
 #include "player.h"
 #include "enums.h"
 #include "constants.h"
@@ -14,19 +16,55 @@ using namespace std;
 Player player;
 int score;
 
+float Clamp(float value,float min, float max){
+    if(value < min){
+        value = min;
+        return value;
+    }
+
+    if(value > max){
+        value = max;
+        return value;
+    }
+
+    return value;
+}
+
+void ClampRef(float &value,float min, float max){
+    if(value < min){
+        value = min;
+    }
+
+    if(value > max){
+        value = max;
+    }
+}
+
+void DrawBackDropScroll(Texture2D background, Vector2 &backdropLoc){
+    int playerFallingScrollOffset = Clamp(abs(player.movementVelocity.y) / 4,1,30);
+
+    backdropLoc.y -= playerFallingScrollOffset;
+
+    // Reset when the texture has fully scrolled out
+    if (backdropLoc.y <= -SCREEN_HEIGHT){
+        backdropLoc.y = 0;
+    }
+
+    // Draw two textures: one at current position, one just below it, and one above
+    DrawTexture(background, backdropLoc.x, backdropLoc.y, { 150, 150, 150, 255 });
+    DrawTexture(background, backdropLoc.x, backdropLoc.y + SCREEN_HEIGHT, { 150, 150, 150, 255 });
+}
+
+
 int main(){
     player = CreatePlayer(200,200,10);
+
+    Vector2 backdropLoc = {0,0};
 
     queue<Obstacle> obstacles;
     vector<Obstacle*> obstaclesInScene;
 
-    Obstacle rec = CreateObstacle(Left, 100, 100);
-    Obstacle rec2 = CreateObstacle(Middle, 100, 100);
-    Obstacle rec3 = CreateObstacle(Right, 100, 100);
-
-    obstacles.push(rec);
-    obstacles.push(rec2);
-    obstacles.push(rec3);
+    obstacles.push(CreateObstacle(Random, 100, 100));
 
     Obstacle* currentObstacle = GetObstacleFromQueue(obstacles, obstaclesInScene);
 
@@ -34,21 +72,33 @@ int main(){
 
     InitWindow(SCREEN_WIDTH,SCREEN_HEIGHT,"Drop");
     SetTargetFPS(TARGET_FPS);
+    
+    Texture2D background = LoadTexture("backDrop.png");
+    //Texture2D projectile = LoadTexture("Projectile_Nail.png");
+
 
     while(!WindowShouldClose()){
         frameCounter++;
 
         //Ammend score every second 
-        if(frameCounter == TARGET_FPS){
-           frameCounter = 0; 
-
+        if(frameCounter % TARGET_FPS == 0){
            score += 1;
         } 
+
 
         //if(IsKeyDown(KEY_W)) player.y -= 5;
         if(IsKeyDown(KEY_A)) player.x -= 5;
        // if(IsKeyDown(KEY_S)) player.y += 5;
         if(IsKeyDown(KEY_D)) player.x += 5;
+
+        player.timeFallingDown = Clamp(player.timeFallingDown + GetFrameTime(),1,player.timeFallingDown + GetFrameTime());
+
+        player.movementVelocity.y += GRAVITY * player.timeFallingDown;
+        ClampRef(player.movementVelocity.y,0,player.maxFallingSpeed);
+
+        //cout << player.movementVelocity.y << endl;
+
+        player.y = SCREEN_HEIGHT / 2;
 
         if(CheckCollisionCircleRec(GetPlayerLocAsVector2(player),player.spawnRadius,currentObstacle->body)){
             cout << "HIT" << endl;
@@ -58,25 +108,25 @@ int main(){
             obstaclesInScene.erase(obstaclesInScene.begin() + currentObstacle->id);
 
             if(obstacles.empty()){
-                obstacles.push(rec);
+                obstacles.push(CreateObstacle(Random, 100, 100));
             }
 
             currentObstacle = GetObstacleFromQueue(obstacles, obstaclesInScene);
-            cout << "Its has left the board type shih" << endl;
         }
 
-        UpdateAllObstacles(obstaclesInScene);
+        UpdateAllObstacles(obstaclesInScene,player);
 
-        cout << obstaclesInScene.size() << endl;
- 
         BeginDrawing();
-            ClearBackground(BLUE);
+            ClearBackground(RAYWHITE);
+            DrawBackDropScroll(background,backdropLoc);
+
             DrawPlayer(player);
-            DrawRectangleRec(currentObstacle->body,RED);
+            DrawRectangleRec(currentObstacle->body, RED);
             DrawText(to_string(score).c_str(),10,0,100,GREEN);
         EndDrawing();
     }
- 
+    
+    UnloadTexture(background);
     CloseWindow();
     return 0;
 }

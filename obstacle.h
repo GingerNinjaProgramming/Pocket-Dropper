@@ -2,6 +2,7 @@
 #define OBSTACLE_H
 #include <raylib.h>
 #include <queue>
+#include <player.h>
 #include "enums.h"
 
 using namespace std;
@@ -9,8 +10,9 @@ using namespace std;
 struct Obstacle{
     Rectangle body;
     int id;
-    int moveSpeed = 10;
+    int moveSpeed = 1;
     bool hasEnteredScreen = false;
+    bool hasHitPlayer = false;
 
     bool operator==(const Obstacle& other) {
         return body.x == other.body.x &&
@@ -31,6 +33,6 @@ Obstacle* GetObstacleFromQueue(queue<Obstacle> &obstacles,vector<Obstacle*> &obs
 
 bool HasObstacleLeftScreen(const Obstacle obstacle);
 
-void UpdateAllObstacles(vector<Obstacle*> &obstaclesInScene);
+void UpdateAllObstacles(vector<Obstacle*> &obstaclesInScene, const Player &player);
 
 #endif

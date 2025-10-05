@@ -2,6 +2,7 @@
 #include "raylib.h"
 #include "constants.h"
 #include <queue>
+#include <player.h>
 
 using namespace std;
 
@@ -19,6 +20,9 @@ Obstacle CreateObstacle(ScreenSide side,int width,int height){
             break;
         case Right:
             spawnX = SCREEN_WIDTH - width;
+            break;
+        case Random:
+            spawnX = GetRandomValue(0, SCREEN_WIDTH - width);
             break;
         default:
             spawnX = 0;
@@ -56,13 +60,13 @@ bool HasObstacleLeftScreen(const Obstacle obstacle){
     return false;
 }
 
-void UpdateAllObstacles(vector<Obstacle*> &obstaclesInScene){
+void UpdateAllObstacles(vector<Obstacle*> &obstaclesInScene, const Player &player){
 
     for (int i = 0; i < obstaclesInScene.size(); i++)
     {
         Obstacle* curOb = obstaclesInScene[i];
-        
-        curOb->body.y -= obstaclesInScene[i]->moveSpeed;
+
+        curOb->body.y -= obstaclesInScene[i]->moveSpeed + (player.movementVelocity.y / 10);
         curOb->id = i;
 
         if(!curOb->hasEnteredScreen){
