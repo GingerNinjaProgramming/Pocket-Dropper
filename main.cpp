@@ -10,6 +10,8 @@
 #include "enums.h"
 #include "constants.h"
 #include "obstacle.h"
+#include "projectile.h"
+#include "sprite.h"
 
 using namespace std;
 
@@ -28,6 +30,18 @@ float Clamp(float value,float min, float max){
     }
 
     return value;
+}
+
+void DestroyObstacle(std::vector<Obstacle *> &obstaclesInScene, Obstacle *&currentObstacle, std::queue<Obstacle> &obstacles)
+{
+    obstaclesInScene.erase(obstaclesInScene.begin() + currentObstacle->id);
+
+    if (obstacles.empty())
+    {
+        obstacles.push(CreateObstacle(Random, 100, 100));
+    }
+
+    currentObstacle = GetObstacleFromQueue(obstacles, obstaclesInScene);
 }
 
 void ClampRef(float &value,float min, float max){
@@ -57,12 +71,12 @@ void DrawBackDropScroll(Texture2D background, Vector2 &backdropLoc){
 
 
 int main(){
-    player = CreatePlayer(200,200,10);
-
     Vector2 backdropLoc = {0,0};
 
     queue<Obstacle> obstacles;
     vector<Obstacle*> obstaclesInScene;
+
+    vector<Projectile*> projectiles;
 
     obstacles.push(CreateObstacle(Random, 100, 100));
 
@@ -73,8 +87,16 @@ int main(){
     InitWindow(SCREEN_WIDTH,SCREEN_HEIGHT,"Drop");
     SetTargetFPS(TARGET_FPS);
     
+
+    player = CreatePlayer(LoadTexture("Player.png"),200,200);
     Texture2D background = LoadTexture("backDrop.png");
+    Texture2D scoreBoard = LoadTexture("ScoreBoard.png");
     //Texture2D projectile = LoadTexture("Projectile_Nail.png");
+
+    Texture2D explosion = LoadTexture("Projectile_Nail.png");
+    SpriteSheet explosionSheet = CreateSpriteSheet(explosion, 2, 1);
+
+    Rectangle plat = {100,100,100,100};
 
 
     while(!WindowShouldClose()){
@@ -85,44 +107,82 @@ int main(){
            score += 1;
         } 
 
+        explosionSheet.frameTimer += 1;
 
-        //if(IsKeyDown(KEY_W)) player.y -= 5;
-        if(IsKeyDown(KEY_A)) player.x -= 5;
-       // if(IsKeyDown(KEY_S)) player.y += 5;
-        if(IsKeyDown(KEY_D)) player.x += 5;
+        if(IsKeyDown(KEY_W) && player.movementVelocity.y > 40) player.fallingOffset += 1;
+        if(IsKeyDown(KEY_S)) player.movementVelocity.y -= 2;
+
+        if(IsKeyDown(KEY_A)) player.movementVelocity.x = -10;
+        if(IsKeyDown(KEY_D)) player.movementVelocity.x = 10;
+
+        if(IsKeyPressed(KEY_LEFT_SHIFT)){
+            DoDash(player);
+        }
+        if(IsKeyPressed(KEY_SPACE)){
+            Projectile* newProjectile = new Projectile(CreateProjectile(player.x,player.y,10,LoadTexture("Pin.png")));
+            projectiles.push_back(newProjectile);
+        }
 
         player.timeFallingDown = Clamp(player.timeFallingDown + GetFrameTime(),1,player.timeFallingDown + GetFrameTime());
 
-        player.movementVelocity.y += GRAVITY * player.timeFallingDown;
+        player.movementVelocity.y = (GRAVITY * player.timeFallingDown) - player.fallingOffset;
         ClampRef(player.movementVelocity.y,0,player.maxFallingSpeed);
 
         //cout << player.movementVelocity.y << endl;
 
         player.y = SCREEN_HEIGHT / 2;
+        player.x += player.movementVelocity.x * player.dashPulse.x;
 
-        if(CheckCollisionCircleRec(GetPlayerLocAsVector2(player),player.spawnRadius,currentObstacle->body)){
+        ClampRef(player.x,0,SCREEN_WIDTH - player.sprite.width);
+
+        if(player.isDashing){
+            player.dashPulse.x -= 1;
+            if(player.dashPulse.x <= 0){
+                player.dashPulse.x = 1;
+                player.isDashing = false;
+            }
+        }
+        
+
+        if(CheckCollisionCircleRec(GetPlayerLocAsVector2(player),player.sprite.width,currentObstacle->body)){
             cout << "HIT" << endl;
         }
         
         if(HasObstacleLeftScreen(*currentObstacle) && currentObstacle->hasEnteredScreen){
-            obstaclesInScene.erase(obstaclesInScene.begin() + currentObstacle->id);
-
-            if(obstacles.empty()){
-                obstacles.push(CreateObstacle(Random, 100, 100));
-            }
-
-            currentObstacle = GetObstacleFromQueue(obstacles, obstaclesInScene);
+            DestroyObstacle(obstaclesInScene, currentObstacle, obstacles);
         }
 
         UpdateAllObstacles(obstaclesInScene,player);
+
+        for(auto& projectile : projectiles){
+            projectile->y += (projectile->speed);
+            ClampRef(projectile->y,player.y,SCREEN_HEIGHT);
+
+            for(auto& obstacle : obstaclesInScene){
+                if(CheckCollisionCircleRec(GetPlayerLocAsVector2(player),player.sprite.width,obstacle->body)){
+                    cout << "Projectile Hit" << endl;
+                }
+                if(CheckCollisionCircleRec({projectile->x,projectile->y},projectile->sprite.width,obstacle->body)){
+                    cout << "Projectile Hit Obstacle" << endl;
+                    projectile->isActive = false;
+
+                    DestroyObstacle(obstaclesInScene, obstacle, obstacles);
+                }
+            }
+        }
 
         BeginDrawing();
             ClearBackground(RAYWHITE);
             DrawBackDropScroll(background,backdropLoc);
 
             DrawPlayer(player);
+            for(const auto& projectile : projectiles){
+                DrawTexture(projectile->sprite, (int)projectile->x, (int)projectile->y, WHITE);
+            }
             DrawRectangleRec(currentObstacle->body, RED);
-            DrawText(to_string(score).c_str(),10,0,100,GREEN);
+            DrawTexture(scoreBoard, 10, 0, WHITE);
+            DrawText(to_string(score).c_str(), 10 + (scoreBoard.width / 2 - 10), 0 + (scoreBoard.height - 40), 30, GREEN);
+
         EndDrawing();
     }
     
