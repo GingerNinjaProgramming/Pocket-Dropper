@@ -1,13 +1,12 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 #include <raylib.h>
-#include "constants.h"
-#include "enums.h"
+#include "constants.hpp"
+#include "enums.hpp"
+
 
 struct Player{
-    Texture2D sprite;
-
-    float x,y;
+    float x,y,spawnRadius;
     Vector2 movementVelocity{0,0};
     int weight = 5;
 
@@ -16,18 +15,15 @@ struct Player{
     float timeFallingDown = 0; //Time spent where the player is pressing to move down
     int maxFallingSpeed = 100;
 
-    int fallingOffset = 0;
-
-    bool isDashing = false;
-    Vector2 dashPulse{1,1};
-
 };
 
-Player CreatePlayer(Texture2D sprite,float spawnX,float spawnY);
+Player CreatePlayer(float spawnX,float spawnY, float spawnRadius);
 
 Vector2 GetPlayerLocAsVector2(const Player &player);
 
 void DrawPlayer(const Player &player);
 
-void DoDash(Player &player);
+
+
+
 #endif

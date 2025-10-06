@@ -1,9 +1,9 @@
 #include "player.h"
 #include "raylib.h"
-#include <iostream>
 
-Player CreatePlayer(Texture2D sprite,float spawnX,float spawnY) {
-    return { sprite, spawnX, spawnY};
+
+Player CreatePlayer(float spawnX,float spawnY, float spawnRadius) {
+    return { spawnX, spawnY, spawnRadius};
 }
 
 Vector2 GetPlayerLocAsVector2(const Player &player){
@@ -12,12 +12,5 @@ Vector2 GetPlayerLocAsVector2(const Player &player){
 }
 
 void DrawPlayer(const Player &player) {
-    DrawTexture(player.sprite, (int)player.x + player.movementVelocity.x, (int)player.y, WHITE);
-}
-
-void DoDash(Player &player){
-    std::cout << "DASH" << std::endl;
-    player.isDashing = true;
-
-    player.dashPulse.x = 5;
+    DrawCircle((int)player.x, (int)player.y, (int)player.spawnRadius, WHITE);
 }

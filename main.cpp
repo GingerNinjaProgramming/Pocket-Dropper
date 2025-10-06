@@ -6,12 +6,10 @@
 #include <queue>
 #include <type_traits>
 #include <concepts>
-#include "player.h"
-#include "enums.h"
-#include "constants.h"
-#include "obstacle.h"
-#include "projectile.h"
-#include "sprite.h"
+#include "player.hpp"
+#include "enums.hpp"
+#include "constants.hpp"
+#include "obstacle.hpp"
 
 using namespace std;
 
@@ -32,18 +30,6 @@ float Clamp(float value,float min, float max){
     return value;
 }
 
-void DestroyObstacle(std::vector<Obstacle *> &obstaclesInScene, Obstacle *&currentObstacle, std::queue<Obstacle> &obstacles)
-{
-    obstaclesInScene.erase(obstaclesInScene.begin() + currentObstacle->id);
-
-    if (obstacles.empty())
-    {
-        obstacles.push(CreateObstacle(Random, 100, 100));
-    }
-
-    currentObstacle = GetObstacleFromQueue(obstacles, obstaclesInScene);
-}
-
 void ClampRef(float &value,float min, float max){
     if(value < min){
         value = min;
@@ -54,52 +40,27 @@ void ClampRef(float &value,float min, float max){
     }
 }
 
-void DrawBackDropScroll(Texture2D background, Vector2 &backdropLoc){
-    int playerFallingScrollOffset = Clamp(abs(player.movementVelocity.y) / 4,1,30);
-
-    backdropLoc.y -= playerFallingScrollOffset;
-
-    // Reset when the texture has fully scrolled out
-    if (backdropLoc.y <= -SCREEN_HEIGHT){
-        backdropLoc.y = 0;
-    }
-
-    // Draw two textures: one at current position, one just below it, and one above
-    DrawTexture(background, backdropLoc.x, backdropLoc.y, { 150, 150, 150, 255 });
-    DrawTexture(background, backdropLoc.x, backdropLoc.y + SCREEN_HEIGHT, { 150, 150, 150, 255 });
-}
-
-
 int main(){
-    Vector2 backdropLoc = {0,0};
-
-    queue<Obstacle> obstacles;
-    vector<Obstacle*> obstaclesInScene;
-
-    vector<Projectile*> projectiles;
-
-    obstacles.push(CreateObstacle(Random, 100, 100));
-
-    Obstacle* currentObstacle = GetObstacleFromQueue(obstacles, obstaclesInScene);
-
-    int frameCounter = 0;
-
     InitWindow(SCREEN_WIDTH,SCREEN_HEIGHT,"Drop");
     SetTargetFPS(TARGET_FPS);
+
+    Camera2D camera = { 0 };
+    player = CreatePlayer(200,200,10);
+
+    // Proper camera setup: offset places the target on screen (center by default),
+    // rotation 0, zoom 1. If zoom is left at 0 (camera = {0}), nothing will be visible.
+    camera.offset = { SCREEN_WIDTH/2.0f, SCREEN_HEIGHT/2.0f };
+    camera.rotation = 0.0f;
+    camera.zoom = 1.0f;
+
+    int frameCounter = 0;
     
-
-    player = CreatePlayer(LoadTexture("Player.png"),200,200);
-    Texture2D background = LoadTexture("backDrop.png");
-    Texture2D scoreBoard = LoadTexture("ScoreBoard.png");
     //Texture2D projectile = LoadTexture("Projectile_Nail.png");
-
-    Texture2D explosion = LoadTexture("Projectile_Nail.png");
-    SpriteSheet explosionSheet = CreateSpriteSheet(explosion, 2, 1);
-
-    Rectangle plat = {100,100,100,100};
 
 
     while(!WindowShouldClose()){
+    // Update camera target to player's world position so the camera follows the player
+    camera.target = { SCREEN_WIDTH / 2, player.y };
         frameCounter++;
 
         //Ammend score every second 
@@ -107,81 +68,27 @@ int main(){
            score += 1;
         } 
 
-        explosionSheet.frameTimer += 1;
+        if(IsKeyDown(KEY_A)) player.x -= 5;
 
-        if(IsKeyDown(KEY_W) && player.movementVelocity.y > 40) player.fallingOffset += 1;
-        if(IsKeyDown(KEY_S)) player.movementVelocity.y -= 2;
+        if(IsKeyDown(KEY_D)) player.x += 5;
 
-        if(IsKeyDown(KEY_A)) player.movementVelocity.x = -10;
-        if(IsKeyDown(KEY_D)) player.movementVelocity.x = 10;
+        player.y += GRAVITY;
 
-        if(IsKeyPressed(KEY_LEFT_SHIFT)){
-            DoDash(player);
-        }
-        if(IsKeyPressed(KEY_SPACE)){
-            Projectile* newProjectile = new Projectile(CreateProjectile(player.x,player.y,10,LoadTexture("Pin.png")));
-            projectiles.push_back(newProjectile);
-        }
-
-        player.timeFallingDown = Clamp(player.timeFallingDown + GetFrameTime(),1,player.timeFallingDown + GetFrameTime());
-
-        player.movementVelocity.y = (GRAVITY * player.timeFallingDown) - player.fallingOffset;
-        ClampRef(player.movementVelocity.y,0,player.maxFallingSpeed);
-
-        //cout << player.movementVelocity.y << endl;
-
-        player.y = SCREEN_HEIGHT / 2;
-        player.x += player.movementVelocity.x * player.dashPulse.x;
-
-        ClampRef(player.x,0,SCREEN_WIDTH - player.sprite.width);
-
-        if(player.isDashing){
-            player.dashPulse.x -= 1;
-            if(player.dashPulse.x <= 0){
-                player.dashPulse.x = 1;
-                player.isDashing = false;
-            }
-        }
-        
-
-        if(CheckCollisionCircleRec(GetPlayerLocAsVector2(player),player.sprite.width,currentObstacle->body)){
+        if(CheckCollisionCircleRec(GetPlayerLocAsVector2(player),player.spawnRadius,currentObstacle->body)){
             cout << "HIT" << endl;
         }
         
-        if(HasObstacleLeftScreen(*currentObstacle) && currentObstacle->hasEnteredScreen){
-            DestroyObstacle(obstaclesInScene, currentObstacle, obstacles);
-        }
 
-        UpdateAllObstacles(obstaclesInScene,player);
-
-        for(auto& projectile : projectiles){
-            projectile->y += (projectile->speed);
-            ClampRef(projectile->y,player.y,SCREEN_HEIGHT);
-
-            for(auto& obstacle : obstaclesInScene){
-                if(CheckCollisionCircleRec(GetPlayerLocAsVector2(player),player.sprite.width,obstacle->body)){
-                    cout << "Projectile Hit" << endl;
-                }
-                if(CheckCollisionCircleRec({projectile->x,projectile->y},projectile->sprite.width,obstacle->body)){
-                    cout << "Projectile Hit Obstacle" << endl;
-                    projectile->isActive = false;
-
-                    DestroyObstacle(obstaclesInScene, obstacle, obstacles);
-                }
-            }
-        }
-
+        // Start drawing and apply camera transform
         BeginDrawing();
             ClearBackground(RAYWHITE);
-            DrawBackDropScroll(background,backdropLoc);
+            BeginMode2D(camera);
 
-            DrawPlayer(player);
-            for(const auto& projectile : projectiles){
-                DrawTexture(projectile->sprite, (int)projectile->x, (int)projectile->y, WHITE);
-            }
-            DrawRectangleRec(currentObstacle->body, RED);
-            DrawTexture(scoreBoard, 10, 0, WHITE);
-            DrawText(to_string(score).c_str(), 10 + (scoreBoard.width / 2 - 10), 0 + (scoreBoard.height - 40), 30, GREEN);
+                DrawTexture(background,backdropLoc.x + player.y,player.y, WHITE);
+                DrawPlayer(player);
+                DrawText(to_string(score).c_str(),10,0,100,GREEN);
+
+            EndMode2D();
 
         EndDrawing();
     }

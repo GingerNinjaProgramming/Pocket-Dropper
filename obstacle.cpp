@@ -1,8 +1,8 @@
-#include "obstacle.h"
+#include "obstacle.hpp"
 #include "raylib.h"
-#include "constants.h"
+#include "constants.hpp"
 #include <queue>
-#include <player.h>
+#include "player.hpp"
 
 using namespace std;
 
