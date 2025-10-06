@@ -40,24 +40,15 @@ void ClampRef(float &value,float min, float max){
     }
 }
 
-void DrawBackDropScroll(Texture2D background, Vector2 &backdropLoc){
-    int playerFallingScrollOffset = Clamp(abs(player.movementVelocity.y) / 4,1,30);
-
-    backdropLoc.y -= playerFallingScrollOffset;
-
-    // Reset when the texture has fully scrolled out
-    if (backdropLoc.y <= -SCREEN_HEIGHT){
-        backdropLoc.y = 0;
-    }
-
-    // Draw two textures: one at current position, one just below it, and one above
-    DrawTexture(background, backdropLoc.x, backdropLoc.y, { 150, 150, 150, 255 });
-    DrawTexture(background, backdropLoc.x, backdropLoc.y + SCREEN_HEIGHT, { 150, 150, 150, 255 });
-}
-
-
 int main(){
+    Camera2D camera = { 0 };
     player = CreatePlayer(200,200,10);
+
+    // Proper camera setup: offset places the target on screen (center by default),
+    // rotation 0, zoom 1. If zoom is left at 0 (camera = {0}), nothing will be visible.
+    camera.offset = { SCREEN_WIDTH/2.0f, SCREEN_HEIGHT/2.0f };
+    camera.rotation = 0.0f;
+    camera.zoom = 1.0f;
 
     Vector2 backdropLoc = {0,0};
 
@@ -78,6 +69,8 @@ int main(){
 
 
     while(!WindowShouldClose()){
+    // Update camera target to player's world position so the camera follows the player
+    camera.target = { SCREEN_WIDTH / 2, player.y };
         frameCounter++;
 
         //Ammend score every second 
@@ -85,20 +78,14 @@ int main(){
            score += 1;
         } 
 
-
-        //if(IsKeyDown(KEY_W)) player.y -= 5;
+        if(IsKeyDown(KEY_W)) player.movementVelocity.y /= 2;
         if(IsKeyDown(KEY_A)) player.x -= 5;
-       // if(IsKeyDown(KEY_S)) player.y += 5;
+
         if(IsKeyDown(KEY_D)) player.x += 5;
-
-        player.timeFallingDown = Clamp(player.timeFallingDown + GetFrameTime(),1,player.timeFallingDown + GetFrameTime());
-
-        player.movementVelocity.y += GRAVITY * player.timeFallingDown;
-        ClampRef(player.movementVelocity.y,0,player.maxFallingSpeed);
 
         //cout << player.movementVelocity.y << endl;
 
-        player.y = SCREEN_HEIGHT / 2;
+        player.y += GRAVITY;
 
         if(CheckCollisionCircleRec(GetPlayerLocAsVector2(player),player.spawnRadius,currentObstacle->body)){
             cout << "HIT" << endl;
@@ -116,13 +103,17 @@ int main(){
 
         UpdateAllObstacles(obstaclesInScene,player);
 
+        // Start drawing and apply camera transform
         BeginDrawing();
             ClearBackground(RAYWHITE);
-            DrawBackDropScroll(background,backdropLoc);
+            BeginMode2D(camera);
 
-            DrawPlayer(player);
-            DrawRectangleRec(currentObstacle->body, RED);
-            DrawText(to_string(score).c_str(),10,0,100,GREEN);
+                DrawPlayer(player);
+                DrawRectangleRec(currentObstacle->body, RED);
+                DrawText(to_string(score).c_str(),10,0,100,GREEN);
+
+            EndMode2D();
+
         EndDrawing();
     }
     
