@@ -1,8 +1,9 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 #include <raylib.h>
-#include "constants.h"
-#include "enums.h"
+#include "constants.hpp"
+#include "enums.hpp"
+
 
 struct Player{
     float x,y,spawnRadius;
@@ -21,6 +22,8 @@ Player CreatePlayer(float spawnX,float spawnY, float spawnRadius);
 Vector2 GetPlayerLocAsVector2(const Player &player);
 
 void DrawPlayer(const Player &player);
+
+
 
 
 #endif

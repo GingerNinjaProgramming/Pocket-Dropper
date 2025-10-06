@@ -1,6 +1,7 @@
 #include "player.h"
 #include "raylib.h"
 
+
 Player CreatePlayer(float spawnX,float spawnY, float spawnRadius) {
     return { spawnX, spawnY, spawnRadius};
 }

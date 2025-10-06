@@ -6,10 +6,10 @@
 #include <queue>
 #include <type_traits>
 #include <concepts>
-#include "player.h"
-#include "enums.h"
-#include "constants.h"
-#include "obstacle.h"
+#include "player.hpp"
+#include "enums.hpp"
+#include "constants.hpp"
+#include "obstacle.hpp"
 
 using namespace std;
 
@@ -41,6 +41,9 @@ void ClampRef(float &value,float min, float max){
 }
 
 int main(){
+    InitWindow(SCREEN_WIDTH,SCREEN_HEIGHT,"Drop");
+    SetTargetFPS(TARGET_FPS);
+
     Camera2D camera = { 0 };
     player = CreatePlayer(200,200,10);
 
@@ -50,21 +53,8 @@ int main(){
     camera.rotation = 0.0f;
     camera.zoom = 1.0f;
 
-    Vector2 backdropLoc = {0,0};
-
-    queue<Obstacle> obstacles;
-    vector<Obstacle*> obstaclesInScene;
-
-    obstacles.push(CreateObstacle(Random, 100, 100));
-
-    Obstacle* currentObstacle = GetObstacleFromQueue(obstacles, obstaclesInScene);
-
     int frameCounter = 0;
-
-    InitWindow(SCREEN_WIDTH,SCREEN_HEIGHT,"Drop");
-    SetTargetFPS(TARGET_FPS);
     
-    Texture2D background = LoadTexture("backDrop.png");
     //Texture2D projectile = LoadTexture("Projectile_Nail.png");
 
 
@@ -78,12 +68,9 @@ int main(){
            score += 1;
         } 
 
-        if(IsKeyDown(KEY_W)) player.movementVelocity.y /= 2;
         if(IsKeyDown(KEY_A)) player.x -= 5;
 
         if(IsKeyDown(KEY_D)) player.x += 5;
-
-        //cout << player.movementVelocity.y << endl;
 
         player.y += GRAVITY;
 
@@ -91,25 +78,14 @@ int main(){
             cout << "HIT" << endl;
         }
         
-        if(HasObstacleLeftScreen(*currentObstacle) && currentObstacle->hasEnteredScreen){
-            obstaclesInScene.erase(obstaclesInScene.begin() + currentObstacle->id);
-
-            if(obstacles.empty()){
-                obstacles.push(CreateObstacle(Random, 100, 100));
-            }
-
-            currentObstacle = GetObstacleFromQueue(obstacles, obstaclesInScene);
-        }
-
-        UpdateAllObstacles(obstaclesInScene,player);
 
         // Start drawing and apply camera transform
         BeginDrawing();
             ClearBackground(RAYWHITE);
             BeginMode2D(camera);
 
+                DrawTexture(background,backdropLoc.x + player.y,player.y, WHITE);
                 DrawPlayer(player);
-                DrawRectangleRec(currentObstacle->body, RED);
                 DrawText(to_string(score).c_str(),10,0,100,GREEN);
 
             EndMode2D();

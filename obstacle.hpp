@@ -2,8 +2,8 @@
 #define OBSTACLE_H
 #include <raylib.h>
 #include <queue>
-#include <player.h>
-#include "enums.h"
+#include <player.hpp>
+#include "enums.hpp"
 
 using namespace std;
 
