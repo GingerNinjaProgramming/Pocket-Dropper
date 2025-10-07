@@ -1,5 +1,5 @@
 #include "sprite.h"
-#include "constants.h"
+#include "constants.hpp"
 
 SpriteSheet CreateSpriteSheet(Texture2D sheet, int frameCount, int timeBetweenFrames)
 {

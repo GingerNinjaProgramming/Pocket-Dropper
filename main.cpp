@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <math.h>
 #include <raylib.h>
+#include <raymath.h>
 #include <vector>
 #include <queue>
 #include <type_traits>
@@ -15,30 +16,6 @@ using namespace std;
 
 Player player;
 int score;
-
-float Clamp(float value,float min, float max){
-    if(value < min){
-        value = min;
-        return value;
-    }
-
-    if(value > max){
-        value = max;
-        return value;
-    }
-
-    return value;
-}
-
-void ClampRef(float &value,float min, float max){
-    if(value < min){
-        value = min;
-    }
-
-    if(value > max){
-        value = max;
-    }
-}
 
 int main(){
     InitWindow(SCREEN_WIDTH,SCREEN_HEIGHT,"Drop");
@@ -59,8 +36,9 @@ int main(){
 
 
     while(!WindowShouldClose()){
-    // Update camera target to player's world position so the camera follows the player
-    camera.target = { SCREEN_WIDTH / 2, player.y };
+        // Update camera target to player's world position so the camera follows the player
+        camera.target = { SCREEN_WIDTH / 2, player.y };
+
         frameCounter++;
 
         //Ammend score every second 
@@ -74,26 +52,21 @@ int main(){
 
         player.y += GRAVITY;
 
-        if(CheckCollisionCircleRec(GetPlayerLocAsVector2(player),player.spawnRadius,currentObstacle->body)){
-            cout << "HIT" << endl;
-        }
-        
 
         // Start drawing and apply camera transform
         BeginDrawing();
-            ClearBackground(RAYWHITE);
+            ClearBackground(RED);
             BeginMode2D(camera);
 
-                DrawTexture(background,backdropLoc.x + player.y,player.y, WHITE);
+                //DrawTexture(background,backdropLoc.x + player.y,player.y, WHITE);
                 DrawPlayer(player);
                 DrawText(to_string(score).c_str(),10,0,100,GREEN);
 
             EndMode2D();
-
         EndDrawing();
     }
     
-    UnloadTexture(background);
+   // UnloadTexture(background);
     CloseWindow();
     return 0;
 }
