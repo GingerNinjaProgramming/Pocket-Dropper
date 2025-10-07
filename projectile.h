@@ -1,7 +1,7 @@
 #ifndef PROJECTILE_H
 #define PROJECTILE_H
+
 #include <raylib.h>
-#include <vector>
 
 struct Projectile{
     Texture2D sprite;
@@ -12,6 +12,5 @@ struct Projectile{
 };
 
 Projectile CreateProjectile(float spawnX,float spawnY, float speed, Texture2D sprite);
-
 
 #endif 

@@ -18,7 +18,6 @@ endif()
 add_executable(PocketDropper
         main.cpp
         player.cpp
-        obstacle.cpp
         projectile.cpp
         sprite.cpp
 )

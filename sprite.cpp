@@ -1,3 +1,4 @@
+#include "raylib.h"
 #include "sprite.h"
 #include "constants.hpp"
 
@@ -10,7 +11,7 @@ SpriteSheet CreateSpriteSheet(Texture2D sheet, int frameCount, int timeBetweenFr
     for (int i = 1; i <= frameCount; i++)
     {
         float frameWidth = sheet.width / frameCount;
-        Rectangle frame = {frameWidth * i ,0,frameWidth, sheet.height};
+        Rectangle frame = {frameWidth * i ,0,frameWidth, (float)sheet.height};
         spriteSheet.frames.push_back(frame);
     }
 
