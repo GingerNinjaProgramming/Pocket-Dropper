@@ -8,22 +8,20 @@ find_package(raylib 5.0 QUIET)
 if (NOT raylib_FOUND)
     include(FetchContent)
     FetchContent_Declare(
-        raylib
-        GIT_REPOSITORY https://github.com/raysan5/raylib.git
-        GIT_TAG 5.0
+            raylib
+            GIT_REPOSITORY https://github.com/raysan5/raylib.git
+            GIT_TAG 5.0
     )
     FetchContent_MakeAvailable(raylib)
 endif()
 
+file(GLOB SOURCES "*.cpp" "Include/*.cpp")
+
 add_executable(PocketDropper
-        main.cpp
-        player.cpp
-        projectile.cpp
-        sprite.cpp
+        ${SOURCES}
 )
 
-
-target_include_directories(PocketDropper PRIVATE .)
+target_include_directories(PocketDropper PRIVATE . Include)
 target_link_libraries(PocketDropper PRIVATE raylib)
 
 if (WIN32)

@@ -2,9 +2,9 @@
 #include "sprite.h"
 #include "constants.hpp"
 
-SpriteSheet CreateSpriteSheet(Texture2D sheet, int frameCount, int timeBetweenFrames)
+Sprite::SpriteSheet CreateSpriteSheet(Texture2D sheet, int frameCount, int timeBetweenFrames)
 {
-    SpriteSheet spriteSheet;
+    Sprite::SpriteSheet spriteSheet;
     spriteSheet.texture = sheet;
     spriteSheet.currentFrame = 0;
 
@@ -18,7 +18,7 @@ SpriteSheet CreateSpriteSheet(Texture2D sheet, int frameCount, int timeBetweenFr
     return spriteSheet;
 }
 
-void DrawSpriteFrame(SpriteSheet &spriteSheet, Vector2 position){
+void DrawSpriteFrame(Sprite::SpriteSheet &spriteSheet, Vector2 position){
 
     Rectangle currentRec = spriteSheet.frames[spriteSheet.currentFrame];
     float scale = 8.0f; // 800%

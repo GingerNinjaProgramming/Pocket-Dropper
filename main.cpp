@@ -8,7 +8,9 @@
 #include <type_traits>
 #include <concepts>
 #include "player.hpp"
+#include "enemy.hpp"
 #include "constants.hpp"
+#include "platform.hpp"
 
 PlayerUtils::Player player;
 int score;
@@ -23,7 +25,11 @@ int main(){
 
     Camera2D camera = { 0 };
     player = PlayerUtils::CreatePlayer(200,200,10);
-    Rectangle ground = {0,SCREEN_HEIGHT - 50,SCREEN_WIDTH,50};
+    PlatformUtils::Platform ground = {{0,SCREEN_HEIGHT - 50,SCREEN_WIDTH,50}};
+    //Global::ground.push_back(ground);
+
+    Enemys::Enemy enemy(100, {SCREEN_WIDTH/2, ground.body.y - 10}, 10);
+    enemy.heath = 10;
 
     camera.offset = { SCREEN_WIDTH/2.0f, SCREEN_HEIGHT/2.0f };
     camera.rotation = 0.0f;
@@ -37,6 +43,7 @@ int main(){
     while(!WindowShouldClose()){
         // Update camera target to player's world position so the camera follows the player
         camera.target = { SCREEN_WIDTH / 2, player.y };
+        Vector2 topLeftWorld = GetScreenToWorld2D({ 0, 0 }, camera);
 
         frameCounter++;
 
@@ -45,27 +52,32 @@ int main(){
            score += 1;
         } 
 
-        if(IsKeyDown(KEY_A)) player.movementVelocity.x -= 5;
-        if(IsKeyDown(KEY_D)) player.movementVelocity.x += 5;
-        if (IsKeyPressed(KEY_SPACE) && player.CanJump()) player.movementVelocity.y -= 5;
+        if (IsKeyDown(KEY_A)) player.movementVelocity.x -= 5;
+        if (IsKeyDown(KEY_D)) player.movementVelocity.x += 5;
 
-        if (!CheckCollisionCircleRec({player.x,player.y},player.spawnRadius,ground)){
-            ClampRef(player.movementVelocity.y += GRAVITY,0,player.maxFallingSpeed);
+        if (IsKeyPressed(KEY_SPACE) && player.CanJump()) player.movementVelocity.y -= player.jumpHeight;
+
+        if (player.x < 0 + player.spawnRadius) player.x = 0 + player.spawnRadius;
+        if (player.x > SCREEN_WIDTH - player.spawnRadius) player.x = SCREEN_WIDTH - player.spawnRadius;
+
+        if (PlatformUtils::CheckPlayerCollisions(ground, player)) {
+            PlayerUtils::HandleFloorCollision(player);
+        }else {
             player.isTouchingGround = false;
-        }else{
-            player.isTouchingGround = true;
         }
 
         PlayerUtils::UpdatePlayer(player);
+        Enemys::UpdateEnemy(enemy);
 
         // Start drawing and apply camera transform
         BeginDrawing();
             ClearBackground(RAYWHITE);
             BeginMode2D(camera);
                 DrawTexture(background,0,0,{ 150, 150, 150, 255 });
-                DrawRectangleRec(ground, BLACK);
+                DrawRectangleRec(ground.body, BLACK);
                 PlayerUtils::DrawPlayer(player);
-                DrawText(std::to_string(score).c_str(),10,0,100,GREEN);
+                Enemys::DrawEnemy(enemy);
+                DrawText(std::to_string(score).c_str(),topLeftWorld.x + 10,topLeftWorld.y,100,GREEN);
             EndMode2D();
         EndDrawing();
     }
