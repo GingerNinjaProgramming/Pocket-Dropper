@@ -13,6 +13,7 @@ namespace PlayerUtils {
 
         player.isTouchingGround = true;
         player.isFalling = false;
+        player.coyoteTimer = 0;
         player.movementVelocity.y = 0;
         player.movementVelocity.x = 0;
         player.timeFallingDown = 0;
@@ -24,7 +25,7 @@ namespace PlayerUtils {
             player.timeFallingDown += GetFrameTime();
             player.movementVelocity.y = GRAVITY * player.weight * (1 + player.timeFallingDown) * GetFrameTime();
         }else if (player.movementVelocity.y < 0) {
-            player.movementVelocity.y += 1;;
+            player.movementVelocity.y += 1;
         }else {
             player.isFalling = false;
         }
@@ -32,7 +33,7 @@ namespace PlayerUtils {
         player.x += player.movementVelocity.x;
         player.y += player.movementVelocity.y;
 
-        player.movementVelocity.x = 0;
+        player.movementVelocity.x *= (float)player.currentFriction / 10;
     }
 
     void DrawPlayer(const Player &player) {

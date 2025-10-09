@@ -12,6 +12,7 @@
 #include "constants.hpp"
 #include "platform.hpp"
 #include "backdrop.hpp"
+#include "enum.hpp"
 
 PlayerUtils::Player player;
 int score;
@@ -21,7 +22,6 @@ void ClampRef(float &value, float min, float max) {
 }
 
 void DrawBackdrop(BackgroundElements::Backdrop &backdrop, const PlayerUtils::Player &player, const Camera2D &camera) {
-
     if (backdrop.position.y + backdrop.texture.height < GetScreenToWorld2D({0,0},camera).y) {
         backdrop.position.y += backdrop.texture.height;
     }
@@ -37,12 +37,6 @@ int main(){
     Camera2D camera = { 0 };
     player = PlayerUtils::CreatePlayer(200,200,10);
 
-    PlatformUtils::Platform ground = {{0,SCREEN_HEIGHT - 50,SCREEN_WIDTH / 2,50}};
-    PlatformUtils::platforms.push_back(ground);
-
-    Enemys::Enemy enemy(100, {SCREEN_WIDTH/2, ground.body.y - 10}, 10);
-    enemy.heath = 10;
-
     camera.offset = { SCREEN_WIDTH/2.0f, SCREEN_HEIGHT/2.0f };
     camera.rotation = 0.0f;
     camera.zoom = 1.0f;
@@ -50,17 +44,22 @@ int main(){
     int frameCounter = 0;
 
     Texture2D background = LoadTexture("C:/Users/conne/CLionProjects/Pocket-Dropper/Resources/backDrop.png");
+    Texture2D ice = LoadTexture("C:/Users/conne/CLionProjects/Pocket-Dropper/Resources/Ice-Block.png");
     Texture2D projectile = LoadTexture("Projectile_Nail.png");
 
-    BackgroundElements::Backdrop backdrop(background, GetScreenToWorld2D({0,(float)background.height / 2},camera));
+    PlatformUtils::SummonPlatform(ice,player, camera, FrictionLevel::Slippery);
 
-    float scrollY = 0.0f;
+    Enemys::Enemy enemy(100, {SCREEN_WIDTH/2, PlatformUtils::platforms[0].body.position.y - 10}, 10);
+    enemy.heath = 10;
+
+    BackgroundElements::Backdrop backdrop(background, GetScreenToWorld2D({0,(float)background.height / 2},camera));
 
     while(!WindowShouldClose()){
         // Update camera target to player's world position so the camera follows the player
         camera.target = { SCREEN_WIDTH / 2, player.y };
+
         Vector2 topLeftWorld = GetScreenToWorld2D({ 0, 0 }, camera);
-        PlatformUtils::SummonPlatform(player, camera);
+        PlatformUtils::SummonPlatform(ice,player, camera, FrictionLevel::Slippery);
 
         frameCounter++;
 
@@ -69,8 +68,8 @@ int main(){
            score += 1;
         } 
 
-        if (IsKeyDown(KEY_A)) player.movementVelocity.x -= 5;
-        if (IsKeyDown(KEY_D)) player.movementVelocity.x += 5;
+        if (IsKeyDown(KEY_A)) player.movementVelocity.x = -5;
+        if (IsKeyDown(KEY_D)) player.movementVelocity.x = 5;
 
         if (IsKeyPressed(KEY_SPACE) && player.CanJump()) player.movementVelocity.y -= player.jumpHeight;
 
@@ -80,12 +79,15 @@ int main(){
         if (PlatformUtils::CheckPlayerCollisions(player)) {
             PlayerUtils::HandleFloorCollision(player);
         }else {
-            player.isTouchingGround = false;
+            player.coyoteTimer += 1;
+
+            if (!player.coyoteTimer <= player.coyoteTime) {
+                player.isTouchingGround = false;
+            }
         }
 
         PlayerUtils::UpdatePlayer(player);
         Enemys::UpdateEnemy(enemy);
-
 
         // Start drawing and apply camera transform
         BeginDrawing();

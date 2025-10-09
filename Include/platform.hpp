@@ -3,17 +3,21 @@
 
 #include <raylib.h>
 #include <vector>
+
+#include "enum.hpp"
 #include "player.hpp"
+#include "spriteUtils.hpp"
 
 namespace PlatformUtils {
     struct Platform {
-        Rectangle body;
+        SpriteUtils::Sprite body;
         int index;
+        FrictionLevel friction = FrictionLevel::Normal;
     };
 
     extern std::vector<Platform> platforms;
 
-    Platform SummonPlatform(const PlayerUtils::Player &player, const Camera2D &camera);
+    Platform SummonPlatform(Texture2D texture,const PlayerUtils::Player &player, const Camera2D &camera,FrictionLevel friction = FrictionLevel::Normal);
 
     bool CheckPlayerCollisions(PlayerUtils::Player &player);
 
