@@ -14,6 +14,7 @@ namespace PlayerUtils {
         player.isTouchingGround = true;
         player.isFalling = false;
         player.movementVelocity.y = 0;
+        player.movementVelocity.x = 0;
         player.timeFallingDown = 0;
     }
 
@@ -35,6 +36,6 @@ namespace PlayerUtils {
     }
 
     void DrawPlayer(const Player &player) {
-        DrawCircle((int)player.x, (int)player.y, (int)player.spawnRadius, RED);
+        DrawCircle((int)player.x, (int)player.y, player.spawnRadius, RED);
     }
 }

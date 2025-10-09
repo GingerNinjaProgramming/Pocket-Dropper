@@ -11,6 +11,7 @@
 #include "enemy.hpp"
 #include "constants.hpp"
 #include "platform.hpp"
+#include "backdrop.hpp"
 
 PlayerUtils::Player player;
 int score;
@@ -19,14 +20,25 @@ void ClampRef(float &value, float min, float max) {
     value = Clamp(value, min, max);
 }
 
+void DrawBackdrop(BackgroundElements::Backdrop &backdrop, const PlayerUtils::Player &player, const Camera2D &camera) {
+
+    if (backdrop.position.y + backdrop.texture.height < GetScreenToWorld2D({0,0},camera).y) {
+        backdrop.position.y += backdrop.texture.height;
+    }
+
+    DrawTexture(backdrop.texture, 0, backdrop.position.y , WHITE);
+    DrawTexture(backdrop.texture, 0, backdrop.position.y  + backdrop.texture.height, WHITE);
+}
+
 int main(){
     InitWindow(SCREEN_WIDTH,SCREEN_HEIGHT,"Drop");
     SetTargetFPS(TARGET_FPS);
 
     Camera2D camera = { 0 };
     player = PlayerUtils::CreatePlayer(200,200,10);
-    PlatformUtils::Platform ground = {{0,SCREEN_HEIGHT - 50,SCREEN_WIDTH,50}};
-    //Global::ground.push_back(ground);
+
+    PlatformUtils::Platform ground = {{0,SCREEN_HEIGHT - 50,SCREEN_WIDTH / 2,50}};
+    PlatformUtils::platforms.push_back(ground);
 
     Enemys::Enemy enemy(100, {SCREEN_WIDTH/2, ground.body.y - 10}, 10);
     enemy.heath = 10;
@@ -40,10 +52,15 @@ int main(){
     Texture2D background = LoadTexture("C:/Users/conne/CLionProjects/Pocket-Dropper/Resources/backDrop.png");
     Texture2D projectile = LoadTexture("Projectile_Nail.png");
 
+    BackgroundElements::Backdrop backdrop(background, GetScreenToWorld2D({0,(float)background.height / 2},camera));
+
+    float scrollY = 0.0f;
+
     while(!WindowShouldClose()){
         // Update camera target to player's world position so the camera follows the player
         camera.target = { SCREEN_WIDTH / 2, player.y };
         Vector2 topLeftWorld = GetScreenToWorld2D({ 0, 0 }, camera);
+        PlatformUtils::SummonPlatform(player, camera);
 
         frameCounter++;
 
@@ -60,7 +77,7 @@ int main(){
         if (player.x < 0 + player.spawnRadius) player.x = 0 + player.spawnRadius;
         if (player.x > SCREEN_WIDTH - player.spawnRadius) player.x = SCREEN_WIDTH - player.spawnRadius;
 
-        if (PlatformUtils::CheckPlayerCollisions(ground, player)) {
+        if (PlatformUtils::CheckPlayerCollisions(player)) {
             PlayerUtils::HandleFloorCollision(player);
         }else {
             player.isTouchingGround = false;
@@ -69,12 +86,13 @@ int main(){
         PlayerUtils::UpdatePlayer(player);
         Enemys::UpdateEnemy(enemy);
 
+
         // Start drawing and apply camera transform
         BeginDrawing();
             ClearBackground(RAYWHITE);
             BeginMode2D(camera);
-                DrawTexture(background,0,0,{ 150, 150, 150, 255 });
-                DrawRectangleRec(ground.body, BLACK);
+                DrawBackdrop(backdrop, player, camera);
+                PlatformUtils::DrawPlatformsOnScreen(player,camera);
                 PlayerUtils::DrawPlayer(player);
                 Enemys::DrawEnemy(enemy);
                 DrawText(std::to_string(score).c_str(),topLeftWorld.x + 10,topLeftWorld.y,100,GREEN);
