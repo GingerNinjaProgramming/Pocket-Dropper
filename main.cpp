@@ -43,20 +43,24 @@ int main(){
 
     int frameCounter = 0;
 
-    Texture2D background = LoadTexture("C:/Users/conne/CLionProjects/Pocket-Dropper/Resources/backDrop.png");
-    Texture2D ice = LoadTexture("C:/Users/conne/CLionProjects/Pocket-Dropper/Resources/Ice-Block.png");
-    Texture2D projectile = LoadTexture("Projectile_Nail.png");
+    Texture2D background = LoadTexture("Resources/backDrop.png");
+    Texture2D ice = LoadTexture("Resources/Ice-Block.png");
+    Texture2D enemyTex = LoadTexture("Resources/Enemy_01.png");
 
     PlatformUtils::SummonPlatform(ice,player, camera, FrictionLevel::Slippery);
 
-    Enemys::Enemy enemy(100, {SCREEN_WIDTH/2, PlatformUtils::platforms[0].body.position.y - 10}, 10);
-    enemy.heath = 10;
+    Enemys::Enemy enemy(
+        100,
+         enemyTex,
+        {SCREEN_WIDTH/2, PlatformUtils::platforms[0].body.position.y - 40},
+        10,
+        enemyTex.height / 2);
 
     BackgroundElements::Backdrop backdrop(background, GetScreenToWorld2D({0,(float)background.height / 2},camera));
 
     while(!WindowShouldClose()){
         // Update camera target to player's world position so the camera follows the player
-        camera.target = { SCREEN_WIDTH / 2, player.y };
+        camera.target = { SCREEN_WIDTH / 2, player.y - player.movementVelocity.y };
 
         Vector2 topLeftWorld = GetScreenToWorld2D({ 0, 0 }, camera);
         PlatformUtils::SummonPlatform(ice,player, camera, FrictionLevel::Slippery);
@@ -86,8 +90,13 @@ int main(){
             }
         }
 
+
+        Enemys::HandlePlayerCollision(enemy,player);
         PlayerUtils::UpdatePlayer(player);
         Enemys::UpdateEnemy(enemy);
+        PlatformUtils::HandlePlatformDespawn(camera);
+
+        std::cout << PlatformUtils::platforms.size() << std::endl;
 
         // Start drawing and apply camera transform
         BeginDrawing();

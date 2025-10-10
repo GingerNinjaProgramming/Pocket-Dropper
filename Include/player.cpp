@@ -1,5 +1,6 @@
 #include "player.hpp"
 #include "constants.hpp"
+#include "platform.hpp"
 #include "raymath.h"
 #include <raylib.h>
 
@@ -38,5 +39,19 @@ namespace PlayerUtils {
 
     void DrawPlayer(const Player &player) {
         DrawCircle((int)player.x, (int)player.y, player.spawnRadius, RED);
+        DrawCircleLines((int)player.x, (int)player.y, player.spawnRadius, GREEN);
+    }
+}
+
+void HandleMissedCollision(PlayerUtils::Player &player,Vector2 previousPos) {
+    float x = fminf(player.x, previousPos.x);
+    float y = fminf(player.y, previousPos.y);
+    float width = fabsf(player.x - previousPos.x);
+    float height = fabsf(player.y - previousPos.y);
+
+    Rectangle checkRect = {x,y,width,height};
+
+    for (auto platform : PlatformUtils::platforms) {
+        if (CheckCollisionRecs())
     }
 }

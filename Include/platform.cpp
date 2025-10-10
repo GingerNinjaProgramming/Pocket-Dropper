@@ -53,13 +53,29 @@ namespace PlatformUtils {
         return false;
     }
 
-    void DrawPlatformsOnScreen(const PlayerUtils::Player &player, const Camera2D &camera) {
+
+    void HandlePlatformDespawn(const Camera2D camera) {
         int screenTopY = GetScreenToWorld2D({0,0},camera).y;
+
+        for (size_t i = 0; i < platforms.size(); ) {
+            auto &platform = platforms[i];
+            if (platform.body.position.y + platform.body.texture.height < screenTopY) {
+                platforms.erase(platforms.begin() + i);
+                // Do not increment i, as the next element shifts into position i
+            } else {
+                ++i;
+            }
+        }
+    }
+
+
+    void DrawPlatformsOnScreen(const PlayerUtils::Player &player, const Camera2D &camera) {
         int screenBottomY = GetScreenToWorld2D({0,SCREEN_HEIGHT},camera).y;
 
         for (auto &platform : platforms) {
-            if (platform.body.position.y < screenBottomY && platform.body.position.y > screenTopY) {
-                DrawTexture(platform.body.texture,platform.body.position.x,platform.body.position.y, DARKGRAY);
+            if (platform.body.position.y < screenBottomY) {
+                DrawTexture(platform.body.texture,platform.body.position.x,platform.body.position.y, RAYWHITE);
+                DrawRectangleLinesEx(platform.body.AsRect(), 2, GREEN);
             }
         }
     }

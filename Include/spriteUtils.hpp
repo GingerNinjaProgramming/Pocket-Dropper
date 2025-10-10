@@ -16,14 +16,16 @@ namespace SpriteUtils {
     struct Sprite {
         Texture2D texture;
         Vector2 position;
+        int collisionBoxYOffset = 0;
 
-        Sprite(Texture2D _texture, Vector2 _position) {
+        Sprite(Texture2D _texture, Vector2 _position, int _collisionBoxYOffset = 0) {
+            this->collisionBoxYOffset = _collisionBoxYOffset;
             this->texture = _texture;
             this->position = _position;
         }
 
         Rectangle AsRect() {
-            return {position.x, position.y, (float)texture.width, (float)texture.height};
+            return {position.x, position.y - collisionBoxYOffset, (float)texture.width, (float)texture.height};
         }
     };
 

@@ -21,6 +21,8 @@ namespace PlatformUtils {
 
     bool CheckPlayerCollisions(PlayerUtils::Player &player);
 
+    void HandlePlatformDespawn(const Camera2D camera);
+
     void DrawPlatformsOnScreen(const PlayerUtils::Player &player, const Camera2D &camera);
 }
 

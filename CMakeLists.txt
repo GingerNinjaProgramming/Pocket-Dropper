@@ -3,6 +3,8 @@ project(Pocket-Dropper LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
+set(CMAKE_EXE_LINKER_FLAGS "-static -static-libgcc -static-libstdc++")
 
 find_package(raylib 5.0 QUIET)
 if (NOT raylib_FOUND)
@@ -15,10 +17,15 @@ if (NOT raylib_FOUND)
     FetchContent_MakeAvailable(raylib)
 endif()
 
-file(GLOB SOURCES "*.cpp" "Include/*.cpp")
+file(GLOB SOURCES "*.cpp" "Include/*.cpp" "Resources/*.png")
 
-add_executable(PocketDropper
-        ${SOURCES}
+add_executable(
+        PocketDropper ${SOURCES}
+)
+
+add_custom_command(TARGET PocketDropper POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/Resources $<TARGET_FILE_DIR:PocketDropper>/Resources
 )
 
 target_include_directories(PocketDropper PRIVATE . Include)
