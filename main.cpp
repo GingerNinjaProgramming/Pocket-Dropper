@@ -83,9 +83,10 @@ int main(){
         if (PlatformUtils::CheckPlayerCollisions(player)) {
             PlayerUtils::HandleFloorCollision(player);
         }else {
+            //Handle Coyote Time
             player.coyoteTimer += 1;
 
-            if (!player.coyoteTimer <= player.coyoteTime) {
+            if (player.coyoteTimer <= player.coyoteTime) {
                 player.isTouchingGround = false;
             }
         }

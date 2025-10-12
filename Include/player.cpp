@@ -3,6 +3,7 @@
 #include "platform.hpp"
 #include "raymath.h"
 #include <raylib.h>
+#include <iostream>
 
 namespace PlayerUtils {
     Player CreatePlayer(float spawnX,float spawnY, float spawnRadius) {
@@ -10,7 +11,9 @@ namespace PlayerUtils {
     }
 
     void HandleFloorCollision(Player &player) {
-        if (player.isTouchingGround) return;
+        if (player.isTouchingGround) {
+            return;
+        }
 
         player.isTouchingGround = true;
         player.isFalling = false;
@@ -20,7 +23,28 @@ namespace PlayerUtils {
         player.timeFallingDown = 0;
     }
 
-    void UpdatePlayer(Player &player) {
+    void HandleMissedCollision(Player &player,Vector2 previousPos) {
+        float x = fminf(player.x, previousPos.x);
+        float y = fminf(player.y, previousPos.y);
+        float width = fabsf(player.x - previousPos.x);
+        float height = fabsf(player.y - previousPos.y);
+
+        Rectangle checkRect = {x,y,width,height};
+
+        for (auto platform : PlatformUtils::platforms) {
+            if (CheckCollisionRecs(checkRect, platform.body.AsRect())){
+                //Collision should of happened but didnt
+                PlayerUtils::HandleFloorCollision(player); //Run regular collision code
+                player.y = platform.body.position.y - player.spawnRadius; //Put player ontop of collided platform
+                std::cout << "Collision missed" << std::endl;
+                return; //Collision has been found
+            }
+        }
+    }
+
+    void UpdatePlayer(Player &player){
+        Vector2 previousPos(player.x,player.y);
+
         if (!player.isTouchingGround && player.movementVelocity.y >= 0) {
             player.isFalling = true;
             player.timeFallingDown += GetFrameTime();
@@ -34,6 +58,8 @@ namespace PlayerUtils {
         player.x += player.movementVelocity.x;
         player.y += player.movementVelocity.y;
 
+        HandleMissedCollision(player, previousPos);
+
         player.movementVelocity.x *= (float)player.currentFriction / 10;
     }
 
@@ -43,15 +69,3 @@ namespace PlayerUtils {
     }
 }
 
-void HandleMissedCollision(PlayerUtils::Player &player,Vector2 previousPos) {
-    float x = fminf(player.x, previousPos.x);
-    float y = fminf(player.y, previousPos.y);
-    float width = fabsf(player.x - previousPos.x);
-    float height = fabsf(player.y - previousPos.y);
-
-    Rectangle checkRect = {x,y,width,height};
-
-    for (auto platform : PlatformUtils::platforms) {
-        if (CheckCollisionRecs())
-    }
-}

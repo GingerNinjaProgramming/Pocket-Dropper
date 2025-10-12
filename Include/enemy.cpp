@@ -13,7 +13,7 @@ namespace Enemys {
 
     void HandlePlayerCollision(Enemy &enemy, PlayerUtils::Player &player) {
         if (CheckCollisionCircleRec({player.x,player.y}, player.spawnRadius, enemy.body.AsRect()) && player.y < enemy.body.AsRect().y){
-            player.movementVelocity.y -= player.jumpHeight - 5;
+            player.movementVelocity.y = -(player.jumpHeight + 5);
             player.movementVelocity.x *= 1.5;
         }
     }
