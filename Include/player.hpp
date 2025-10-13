@@ -26,6 +26,10 @@ namespace PlayerUtils {
         bool CanJump() {
             return isTouchingGround;
         }
+
+        Vector2 AsVector2() {
+            return Vector2(x,y);
+        }
     };
 
     Player CreatePlayer(float spawnX,float spawnY, float spawnRadius);

@@ -1,6 +1,7 @@
 #include "player.hpp"
 #include "constants.hpp"
 #include "platform.hpp"
+#include "weapon.hpp"
 #include "raymath.h"
 #include <raylib.h>
 #include <iostream>
@@ -40,6 +41,20 @@ namespace PlayerUtils {
                 return; //Collision has been found
             }
         }
+
+        for (auto enemy : Enemys::enemys) {
+            if (CheckCollisionRecs(checkRect, enemy->body.AsRect())){
+                //Collision should of happened but didnt
+                PlayerUtils::HandleFloorCollision(player); //Run regular collision code
+                player.y = enemy->body.position.y - player.spawnRadius; //Put player ontop of collided platform
+                std::cout << "Collision missed" << std::endl;
+                return; //Collision has been found
+            }
+        }
+    }
+
+    void Shoot() {
+       WeaponUtils::Bullet newBullet;
     }
 
     void UpdatePlayer(Player &player){
