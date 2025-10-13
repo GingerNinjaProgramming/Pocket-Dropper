@@ -9,7 +9,7 @@ namespace PlatformUtils {
 
     std::vector<Platform> platforms;
 
-    Platform SummonPlatform(Texture2D texture,const PlayerUtils::Player &player, const Camera2D &camera,FrictionLevel friction) {
+    Platform SummonPlatform(Texture2D texture,const PlayerUtils::Player &player, const Camera2D &camera,FrictionLevel friction, Enemys::Enemy potentialEnemy) {
 
         SpriteUtils::Sprite sprite = {texture, {0,0}};
         int screenBottom = GetScreenToWorld2D({0,SCREEN_HEIGHT},camera).y - 20;
@@ -17,25 +17,36 @@ namespace PlatformUtils {
         retry_platform_spawn:
 
         int spawnY = GetRandomValue(screenBottom, screenBottom + SCREEN_HEIGHT);
-        int spawnWidth = GetRandomValue(100,SCREEN_WIDTH * 0.9);
-        int spawnX = GetRandomValue(spawnWidth, GetScreenWidth() - spawnWidth);
+        int spawnWidth = GetRandomValue(80,SCREEN_WIDTH * 0.75);
+        int spawnX = GetRandomValue(0, GetScreenWidth() - spawnWidth);
         int spawnHeight = 50;
 
         Rectangle potentialPlatform = {(float)spawnX, (float)spawnY, (float)spawnWidth, (float)spawnHeight};
 
+        if (platforms.empty()) goto skip_platform_check; //Skip the platform check if there are no platforms
+
         for (auto platform : platforms) {
+            //Why did I do this? - Conner 2025 O I C this is to prevent platforms spawing in the player vision - Conner 2025 like 5 minutes later
             if (platform.body.position.y > screenBottom && platform.body.position.y < screenBottom + SCREEN_HEIGHT) {
                 return {SpriteUtils::Sprite{Texture2D{},{0,0}},-1};
             }
 
-            platform.body.texture.width += 20;
-
-            if (CheckCollisionRecs(platform.body.AsRect(),potentialPlatform)) {
+            if (CheckCollisionRecs(platform.body.AsRect({0,100}),potentialPlatform)) {
                 goto retry_platform_spawn;
             }
         }
 
+        skip_platform_check:
+
         Platform newPlatform = {SpriteUtils::CreateSprite(texture,potentialPlatform), (int)platforms.size() + 1,friction};
+
+        if (potentialEnemy != Enemys::Enemy{}) {
+            potentialEnemy.body.position = {
+                SCREEN_WIDTH / 2, newPlatform.body.AsRect().y - (potentialEnemy.body.texture.height - 10)
+            };
+
+            Enemys::CreateEnemyFromStruct(potentialEnemy);
+        }
 
         platforms.push_back(newPlatform);
         return newPlatform;

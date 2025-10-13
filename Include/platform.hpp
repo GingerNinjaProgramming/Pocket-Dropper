@@ -4,6 +4,7 @@
 #include <raylib.h>
 #include <vector>
 
+#include "enemy.hpp"
 #include "enum.hpp"
 #include "player.hpp"
 #include "spriteUtils.hpp"
@@ -17,7 +18,7 @@ namespace PlatformUtils {
 
     extern std::vector<Platform> platforms;
 
-    Platform SummonPlatform(Texture2D texture,const PlayerUtils::Player &player, const Camera2D &camera,FrictionLevel friction = FrictionLevel::Normal);
+    Platform SummonPlatform(Texture2D texture,const PlayerUtils::Player &player, const Camera2D &camera,FrictionLevel friction = FrictionLevel::Normal, Enemys::Enemy potentialEnemy = Enemys::Enemy{});
 
     bool CheckPlayerCollisions(PlayerUtils::Player &player);
 

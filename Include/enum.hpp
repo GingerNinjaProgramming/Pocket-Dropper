@@ -6,4 +6,8 @@ enum FrictionLevel{
     Slippery = 9,
 };
 
+enum GameState {
+    Playing,
+    Paused
+};
 #endif

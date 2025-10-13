@@ -30,10 +30,67 @@ void DrawBackdrop(BackgroundElements::Backdrop &backdrop, const PlayerUtils::Pla
     DrawTexture(backdrop.texture, 0, backdrop.position.y  + backdrop.texture.height, WHITE);
 }
 
+void HandlePlayingLoop(Camera2D &camera, int frameCounter, Texture2D ice, Enemys::Enemy basePlatformEnemy, BackgroundElements::Backdrop backdrop) {
+    // Update camera target to player's world position so the camera follows the player
+    camera.target = { SCREEN_WIDTH / 2, player.y - player.movementVelocity.y };
+
+    Vector2 topLeftWorld = GetScreenToWorld2D({ 0, 0 }, camera);
+
+
+    PlatformUtils::SummonPlatform(ice,player, camera, FrictionLevel::Slippery,GetRandomValue(0,10) > 7 ? basePlatformEnemy : Enemys::Enemy{});
+
+    frameCounter++;
+
+    //Ammend score every second
+    if(frameCounter % TARGET_FPS == 0){
+        score += 1;
+    }
+
+    if (IsKeyDown(KEY_A)) player.movementVelocity.x = -5;
+    if (IsKeyDown(KEY_D)) player.movementVelocity.x = 5;
+
+    if (IsKeyPressed(KEY_SPACE) && player.CanJump()) player.movementVelocity.y -= player.jumpHeight;
+
+    if (player.x < 0 + player.spawnRadius) player.x = 0 + player.spawnRadius;
+    if (player.x > SCREEN_WIDTH - player.spawnRadius) player.x = SCREEN_WIDTH - player.spawnRadius;
+
+    if (PlatformUtils::CheckPlayerCollisions(player)) {
+        PlayerUtils::HandleFloorCollision(player);
+    }else {
+        //Handle Coyote Time
+        player.coyoteTimer += 1;
+
+        if (player.coyoteTimer <= player.coyoteTime) {
+            player.isTouchingGround = false;
+        }
+    }
+
+
+    Enemys::HandleAllEnemyCollision(player);
+    PlayerUtils::UpdatePlayer(player);
+    Enemys::UpdateEnemies();
+    PlatformUtils::HandlePlatformDespawn(camera);
+
+    std::cout << PlatformUtils::platforms.size() << std::endl;
+
+    // Start drawing and apply camera transform
+    BeginDrawing();
+        ClearBackground(RAYWHITE);
+        BeginMode2D(camera);
+        DrawBackdrop(backdrop, player, camera);
+        PlatformUtils::DrawPlatformsOnScreen(player,camera);
+        PlayerUtils::DrawPlayer(player);
+        Enemys::DrawEnemiesOnScreen();
+        DrawText(std::to_string(score).c_str(),topLeftWorld.x + 10,topLeftWorld.y,100,GREEN);
+        EndMode2D();
+    EndDrawing();
+}
+
 int main(){
     InitWindow(SCREEN_WIDTH,SCREEN_HEIGHT,"Drop");
     SetTargetFPS(TARGET_FPS);
 
+    GameState gameState = Playing;
     Camera2D camera = { 0 };
     player = PlayerUtils::CreatePlayer(200,200,10);
 
@@ -47,69 +104,32 @@ int main(){
     Texture2D ice = LoadTexture("Resources/Ice-Block.png");
     Texture2D enemyTex = LoadTexture("Resources/Enemy_01.png");
 
-    PlatformUtils::SummonPlatform(ice,player, camera, FrictionLevel::Slippery);
-
-    Enemys::Enemy enemy(
-        100,
+    //This exists more a pre-contructed enemy to be used on platforms - Move into Enemy namespace later
+    Enemys::Enemy basePlatformEnemy(
+        1,
          enemyTex,
-        {SCREEN_WIDTH/2, PlatformUtils::platforms[0].body.position.y - 40},
+        {SCREEN_WIDTH/2, 0},
         10,
         enemyTex.height / 2);
 
     BackgroundElements::Backdrop backdrop(background, GetScreenToWorld2D({0,(float)background.height / 2},camera));
 
     while(!WindowShouldClose()){
-        // Update camera target to player's world position so the camera follows the player
-        camera.target = { SCREEN_WIDTH / 2, player.y - player.movementVelocity.y };
-
-        Vector2 topLeftWorld = GetScreenToWorld2D({ 0, 0 }, camera);
-        PlatformUtils::SummonPlatform(ice,player, camera, FrictionLevel::Slippery);
-
-        frameCounter++;
-
-        //Ammend score every second 
-        if(frameCounter % TARGET_FPS == 0){
-           score += 1;
-        } 
-
-        if (IsKeyDown(KEY_A)) player.movementVelocity.x = -5;
-        if (IsKeyDown(KEY_D)) player.movementVelocity.x = 5;
-
-        if (IsKeyPressed(KEY_SPACE) && player.CanJump()) player.movementVelocity.y -= player.jumpHeight;
-
-        if (player.x < 0 + player.spawnRadius) player.x = 0 + player.spawnRadius;
-        if (player.x > SCREEN_WIDTH - player.spawnRadius) player.x = SCREEN_WIDTH - player.spawnRadius;
-
-        if (PlatformUtils::CheckPlayerCollisions(player)) {
-            PlayerUtils::HandleFloorCollision(player);
-        }else {
-            //Handle Coyote Time
-            player.coyoteTimer += 1;
-
-            if (player.coyoteTimer <= player.coyoteTime) {
-                player.isTouchingGround = false;
-            }
+        switch (gameState) {
+            case Playing:
+                HandlePlayingLoop(camera, frameCounter, ice, basePlatformEnemy, backdrop);
+                if (IsKeyDown(KEY_P)) gameState = Paused;
+                break;
+            case Paused:
+                BeginDrawing();
+                ClearBackground(RAYWHITE);
+                BeginMode2D(camera);
+                    DrawText("Wow what a cool piece of pausing you did there well done champ", 100,100,20,BLACK);
+                EndMode2D();
+                EndDrawing();
+                break;
         }
 
-
-        Enemys::HandlePlayerCollision(enemy,player);
-        PlayerUtils::UpdatePlayer(player);
-        Enemys::UpdateEnemy(enemy);
-        PlatformUtils::HandlePlatformDespawn(camera);
-
-        std::cout << PlatformUtils::platforms.size() << std::endl;
-
-        // Start drawing and apply camera transform
-        BeginDrawing();
-            ClearBackground(RAYWHITE);
-            BeginMode2D(camera);
-                DrawBackdrop(backdrop, player, camera);
-                PlatformUtils::DrawPlatformsOnScreen(player,camera);
-                PlayerUtils::DrawPlayer(player);
-                Enemys::DrawEnemy(enemy);
-                DrawText(std::to_string(score).c_str(),topLeftWorld.x + 10,topLeftWorld.y,100,GREEN);
-            EndMode2D();
-        EndDrawing();
     }
     
     UnloadTexture(background);

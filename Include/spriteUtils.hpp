@@ -24,8 +24,15 @@ namespace SpriteUtils {
             this->position = _position;
         }
 
-        Rectangle AsRect() {
-            return {position.x, position.y - collisionBoxYOffset, (float)texture.width, (float)texture.height};
+        Rectangle AsRect(Vector2 sizeOffset = {0,0}) const {
+            return {position.x, position.y - collisionBoxYOffset, (float)texture.width + sizeOffset.x, (float)texture.height + sizeOffset.y};
+        }
+
+        bool operator==(const Sprite &other) const {
+            return texture.id == other.texture.id &&
+                   position.x == other.position.x &&
+                   position.y == other.position.y &&
+                   collisionBoxYOffset == other.collisionBoxYOffset;
         }
     };
 
