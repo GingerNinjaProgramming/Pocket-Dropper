@@ -2,6 +2,17 @@
 #include "spriteUtils.hpp"
 
 namespace SpriteUtils {
+
+    Texture2D background;
+    Texture2D ice;
+    Texture2D enemyTex;
+
+    void InitalizeTextures() {
+        background = LoadTexture("Resources/backDrop.png");
+        ice = LoadTexture("Resources/Ice-Block.png");
+        enemyTex = LoadTexture("Resources/Enemy_01.png");
+    }
+
     Sprite CreateSprite(Texture2D _texture, Rectangle _rect)
     {
         _texture.width = _rect.width;

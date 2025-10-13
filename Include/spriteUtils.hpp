@@ -5,6 +5,11 @@
 #include <vector>
 
 namespace SpriteUtils {
+
+    extern Texture2D background;
+    extern Texture2D ice;
+    extern Texture2D enemyTex;
+
     struct SpriteSheet{
         Texture2D texture;
         std::vector<Rectangle> frames;
@@ -35,6 +40,8 @@ namespace SpriteUtils {
                    collisionBoxYOffset == other.collisionBoxYOffset;
         }
     };
+
+    void InitalizeTextures();
 
     Sprite CreateSprite(Texture2D _texture, Rectangle _rect);
 

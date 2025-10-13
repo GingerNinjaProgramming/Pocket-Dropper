@@ -53,8 +53,11 @@ namespace PlayerUtils {
         }
     }
 
-    void Shoot() {
-       WeaponUtils::Bullet newBullet;
+    void FireBullet(Player &player) {
+        WeaponUtils::CreateBullet(SpriteUtils::ice, player );
+
+        player.movementVelocity.y = -(10);
+        player.movementVelocity.x *= 1.25;
     }
 
     void UpdatePlayer(Player &player){

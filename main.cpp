@@ -13,8 +13,10 @@
 #include "platform.hpp"
 #include "backdrop.hpp"
 #include "enum.hpp"
+#include "weapon.hpp"
 
 PlayerUtils::Player player;
+int score;
 
 void ClampRef(float &value, float min, float max) {
     value = Clamp(value, min, max);
@@ -29,7 +31,7 @@ void DrawBackdrop(BackgroundElements::Backdrop &backdrop, const PlayerUtils::Pla
     DrawTexture(backdrop.texture, 0, backdrop.position.y  + backdrop.texture.height, WHITE);
 }
 
-void HandlePlayingLoop(Camera2D &camera, int frameCounter, Texture2D ice, Enemys::Enemy basePlatformEnemy, BackgroundElements::Backdrop &backdrop) {
+void HandlePlayingLoop(Camera2D &camera, int frameCounter, Texture2D ice, Enemys::Enemy basePlatformEnemy, BackgroundElements::Backdrop backdrop) {
     // Update camera target to player's world position so the camera follows the player
     camera.target = { SCREEN_WIDTH / 2, player.y - player.movementVelocity.y };
 
@@ -38,10 +40,20 @@ void HandlePlayingLoop(Camera2D &camera, int frameCounter, Texture2D ice, Enemys
 
     PlatformUtils::SummonPlatform(ice,player, camera, FrictionLevel::Slippery,GetRandomValue(0,10) > 7 ? basePlatformEnemy : Enemys::Enemy{});
 
-    if (IsKeyDown(KEY_A)) player.movementVelocity.x = -5;
-    if (IsKeyDown(KEY_D)) player.movementVelocity.x = 5;
+    frameCounter++;
 
-    if (IsKeyPressed(KEY_SPACE) && player.CanJump()) player.movementVelocity.y -= player.jumpHeight;
+    //Ammend score every second
+    if(frameCounter % TARGET_FPS == 0){
+        score += 1;
+    }
+
+    if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) player.movementVelocity.x = -5;
+    if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) player.movementVelocity.x = 5;
+
+    if (IsKeyPressed(KEY_SPACE)) {
+        if (player.CanJump()) player.movementVelocity.y -= player.jumpHeight;
+        else PlayerUtils::FireBullet(player);
+    };
 
     if (player.x < 0 + player.spawnRadius) player.x = 0 + player.spawnRadius;
     if (player.x > SCREEN_WIDTH - player.spawnRadius) player.x = SCREEN_WIDTH - player.spawnRadius;
@@ -60,6 +72,7 @@ void HandlePlayingLoop(Camera2D &camera, int frameCounter, Texture2D ice, Enemys
 
     Enemys::HandleAllEnemyCollision(player);
     PlayerUtils::UpdatePlayer(player);
+    WeaponUtils::UpdateBullets();
     Enemys::UpdateEnemies();
     PlatformUtils::HandlePlatformDespawn(camera);
 
@@ -73,7 +86,7 @@ void HandlePlayingLoop(Camera2D &camera, int frameCounter, Texture2D ice, Enemys
         PlatformUtils::DrawPlatformsOnScreen(player,camera);
         PlayerUtils::DrawPlayer(player);
         Enemys::DrawEnemiesOnScreen();
-        DrawText(std::to_string((int)(player.y / 100)).c_str(),topLeftWorld.x + 10,topLeftWorld.y,100,GREEN);
+        DrawText(std::to_string(score).c_str(),topLeftWorld.x + 10,topLeftWorld.y,100,GREEN);
         EndMode2D();
     EndDrawing();
 }
@@ -92,35 +105,30 @@ int main(){
 
     int frameCounter = 0;
 
-    Texture2D background = LoadTexture("Resources/backDrop.png");
-    Texture2D ice = LoadTexture("Resources/Ice-Block.png");
-    Texture2D enemyTex = LoadTexture("Resources/Enemy_01.png");
+    //Loads all needed textures into SpriteUtils namespace
+    SpriteUtils::InitalizeTextures();
 
     //This exists more a pre-contructed enemy to be used on platforms - Move into Enemy namespace later
     Enemys::Enemy basePlatformEnemy(
         1,
-         enemyTex,
+         SpriteUtils::enemyTex,
         {SCREEN_WIDTH/2, 0},
         10,
-        enemyTex.height / 2);
+        SpriteUtils::enemyTex.height / 2);
 
-    BackgroundElements::Backdrop backdrop(background, GetScreenToWorld2D({0,(float)background.height / 2},camera));
+    BackgroundElements::Backdrop backdrop(SpriteUtils::background, GetScreenToWorld2D({0,(float)SpriteUtils::background.height / 2},camera));
 
     while(!WindowShouldClose()){
         switch (gameState) {
             case Playing:
-                HandlePlayingLoop(camera, frameCounter, ice, basePlatformEnemy, backdrop);
-                if (IsKeyReleased(KEY_P)) gameState = Paused;
+                HandlePlayingLoop(camera, frameCounter, SpriteUtils::ice, basePlatformEnemy, backdrop);
+                if (IsKeyDown(KEY_P)) gameState = Paused;
                 break;
             case Paused:
-                if (IsKeyReleased(KEY_L)) gameState = Playing;
-
-                Vector2 textSpawnLoc = GetScreenToWorld2D({SCREEN_WIDTH/2,SCREEN_HEIGHT/2}, camera);
-                int textWidth = MeasureText("Wow what a cool piece of pausing you did there well done champ",15);
-
                 BeginDrawing();
+                ClearBackground(RAYWHITE);
                 BeginMode2D(camera);
-                    DrawText("Wow what a cool piece of pausing you did there well done champ",textSpawnLoc.x - (textWidth / 2),textSpawnLoc.y,15,BLACK);
+                    DrawText("Wow what a cool piece of pausing you did there well done champ", 100,100,20,BLACK);
                 EndMode2D();
                 EndDrawing();
                 break;
@@ -128,7 +136,7 @@ int main(){
 
     }
     
-    UnloadTexture(background);
+    UnloadTexture(SpriteUtils::background);
     CloseWindow();
     return 0;
 }

@@ -1,6 +1,7 @@
 #ifndef WEAPON_HPP
 #define WEAPON_HPP
 #include "spriteUtils.hpp"
+#include "player.hpp"
 
 namespace WeaponUtils {
     struct Bullet {
@@ -15,7 +16,7 @@ namespace WeaponUtils {
 
     extern std::vector<Bullet*> bullets;
 
-    void CreateBullet();
+    void CreateBullet(Texture2D tex,PlayerUtils::Player shooter, int bulletSpeed = 10);
 
     void UpdateBullets();
 }

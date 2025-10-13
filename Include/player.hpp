@@ -38,6 +38,8 @@ namespace PlayerUtils {
 
     void HandleFloorCollision(Player &player);
 
+    void FireBullet(Player &player);
+
     void DrawPlayer(const Player &player);
 }
 
