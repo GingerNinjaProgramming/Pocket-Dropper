@@ -8,7 +8,8 @@ namespace SpriteUtils {
 
     extern Texture2D background;
     extern Texture2D ice;
-    extern Texture2D enemyTex;
+    extern Texture2D enemyTex01;
+    extern Texture2D enemyTex02;
 
     struct SpriteSheet{
         Texture2D texture;

@@ -7,6 +7,8 @@
 #include <iostream>
 
 namespace PlayerUtils {
+    Player player;
+
     Player CreatePlayer(float spawnX,float spawnY, float spawnRadius) {
         return { spawnX, spawnY, spawnRadius};
     }

@@ -31,14 +31,13 @@ void DrawBackdrop(BackgroundElements::Backdrop &backdrop, const PlayerUtils::Pla
     DrawTexture(backdrop.texture, 0, backdrop.position.y  + backdrop.texture.height, WHITE);
 }
 
-void HandlePlayingLoop(Camera2D &camera, int frameCounter, Texture2D ice, Enemys::Enemy basePlatformEnemy, BackgroundElements::Backdrop backdrop) {
+void HandlePlayingLoop(Camera2D &camera, int frameCounter, Texture2D ice, Enemys::Enemy enemys[], BackgroundElements::Backdrop &backdrop) {
     // Update camera target to player's world position so the camera follows the player
     camera.target = { SCREEN_WIDTH / 2, player.y - player.movementVelocity.y };
 
     Vector2 topLeftWorld = GetScreenToWorld2D({ 0, 0 }, camera);
 
-
-    PlatformUtils::SummonPlatform(ice,player, camera, FrictionLevel::Slippery,GetRandomValue(0,10) > 7 ? basePlatformEnemy : Enemys::Enemy{});
+    PlatformUtils::SummonPlatform(ice,player, camera, FrictionLevel::Slippery,GetRandomValue(0,10) > 7 ? enemys[0] : Enemys::Enemy{});
 
     frameCounter++;
 
@@ -54,6 +53,11 @@ void HandlePlayingLoop(Camera2D &camera, int frameCounter, Texture2D ice, Enemys
         if (player.CanJump()) player.movementVelocity.y -= player.jumpHeight;
         else PlayerUtils::FireBullet(player);
     };
+
+    if (IsKeyDown(KEY_M)) {
+        enemys[1].body.position = GetScreenToWorld2D({SCREEN_WIDTH/2,0}, camera);
+        Enemys::CreateEnemyFromStruct(enemys[1]);
+    }
 
     if (player.x < 0 + player.spawnRadius) player.x = 0 + player.spawnRadius;
     if (player.x > SCREEN_WIDTH - player.spawnRadius) player.x = SCREEN_WIDTH - player.spawnRadius;
@@ -73,7 +77,7 @@ void HandlePlayingLoop(Camera2D &camera, int frameCounter, Texture2D ice, Enemys
     Enemys::HandleAllEnemyCollision(player);
     PlayerUtils::UpdatePlayer(player);
     WeaponUtils::UpdateBullets();
-    Enemys::UpdateEnemies();
+    Enemys::UpdateEnemies(player);
     PlatformUtils::HandlePlatformDespawn(camera);
 
     std::cout << PlatformUtils::platforms.size() << std::endl;
@@ -110,18 +114,32 @@ int main(){
 
     //This exists more a pre-contructed enemy to be used on platforms - Move into Enemy namespace later
     Enemys::Enemy basePlatformEnemy(
+        EnemyType::Platform,
         1,
-         SpriteUtils::enemyTex,
+         SpriteUtils::enemyTex01,
         {SCREEN_WIDTH/2, 0},
         10,
-        SpriteUtils::enemyTex.height / 2);
+        SpriteUtils::enemyTex01.height / 2
+    );
+
+    Enemys::Enemy trackerEnemy(
+        EnemyType::Chaser,
+        1,
+        SpriteUtils::enemyTex02,
+        {SCREEN_WIDTH/2, 0},
+        10,
+        SpriteUtils::enemyTex02.height / 2
+    );
+    trackerEnemy.moveSpeed = 15;
+
+    Enemys::Enemy enemys[] =  {basePlatformEnemy,trackerEnemy};
 
     BackgroundElements::Backdrop backdrop(SpriteUtils::background, GetScreenToWorld2D({0,(float)SpriteUtils::background.height / 2},camera));
 
     while(!WindowShouldClose()){
         switch (gameState) {
             case Playing:
-                HandlePlayingLoop(camera, frameCounter, SpriteUtils::ice, basePlatformEnemy, backdrop);
+                HandlePlayingLoop(camera, frameCounter, SpriteUtils::ice, enemys, backdrop);
                 if (IsKeyDown(KEY_P)) gameState = Paused;
                 break;
             case Paused:

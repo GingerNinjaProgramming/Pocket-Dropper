@@ -1,18 +1,22 @@
 ﻿#include "enemy.hpp"
+
+#include <cmath>
+
 #include "constants.hpp"
 #include "player.hpp"
+#include "enum.hpp"
 
 namespace Enemys {
     std::vector<Enemy*> enemys;
 
-    void CreateEnemy(int heath, Texture2D sprite, Vector2 postion, int spawnRadius, int collisionBoxYOffset) {
-        Enemy *newEnemy = new Enemy(heath, sprite, postion, spawnRadius, collisionBoxYOffset);
+    void CreateEnemy(EnemyType type ,int heath, Texture2D sprite, Vector2 postion, int spawnRadius, int collisionBoxYOffset) {
+        Enemy *newEnemy = new Enemy(type,heath, sprite, postion, spawnRadius, collisionBoxYOffset);
         newEnemy->id = (int)enemys.size();
         enemys.push_back(newEnemy);
     }
 
     void CreateEnemyFromStruct(Enemy enemy) {
-        CreateEnemy(enemy.heath,enemy.body.texture,enemy.body.position,enemy.spawnRadius,enemy.body.collisionBoxYOffset);
+        CreateEnemy(enemy.type,enemy.heath,enemy.body.texture,enemy.body.position,enemy.spawnRadius,enemy.body.collisionBoxYOffset);
     }
 
 
@@ -25,21 +29,40 @@ namespace Enemys {
             }
         }
     }
-    void UpdateEnemy(Enemy &enemy) {
-        enemy.body.position.x += enemy.moveDirX;
+    void UpdateEnemy(Enemy &enemy, PlayerUtils::Player &player) {
+        switch (enemy.type) {
+            case EnemyType::Platform:
+                enemy.body.position.x += enemy.moveSpeed;
 
-        if (enemy.body.position.x < 0 + enemy.spawnRadius || enemy.body.position.x > SCREEN_WIDTH - enemy.spawnRadius) {
-            enemy.moveDirX *= -1;
-        }
+                if (enemy.body.position.x < 0 + enemy.spawnRadius || enemy.body.position.x > SCREEN_WIDTH - enemy.spawnRadius) {
+                    enemy.moveSpeed *= -1;
+                }
 
-        if (enemy.heath <= 0) {
-            DestroyEnemy(&enemy);
+                if (enemy.heath <= 0) {
+                    DestroyEnemy(&enemy);
+                }
+
+                break;
+            case EnemyType::Chaser:
+                float dx = player.x - enemy.body.position.x;
+                float dy = player.y - enemy.body.position.y;
+                float dist = sqrtf(dx*dx + dy*dy);
+
+                if (dist > 0.0001f) {
+                    if (dist > 18.0f) {
+                        float nx = dx / dist;
+                        float ny = dy / dist;
+                        enemy.body.position.x += nx * 1.8f;
+                        enemy.body.position.y += ny * 1.8f;
+                    }
+                }
+                break;
         }
     }
 
-    void UpdateEnemies() {
+    void UpdateEnemies(PlayerUtils::Player &player) {
         for (auto enemy : enemys) {
-            UpdateEnemy(*enemy);
+            UpdateEnemy(*enemy,player);
         }
     }
 

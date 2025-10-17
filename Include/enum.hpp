@@ -10,4 +10,9 @@ enum GameState {
     Playing,
     Paused
 };
+
+enum EnemyType {
+    Platform,
+    Chaser
+};
 #endif

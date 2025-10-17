@@ -5,12 +5,14 @@ namespace SpriteUtils {
 
     Texture2D background;
     Texture2D ice;
-    Texture2D enemyTex;
+    Texture2D enemyTex01;
+    Texture2D enemyTex02;
 
     void InitalizeTextures() {
         background = LoadTexture("Resources/backDrop.png");
         ice = LoadTexture("Resources/Ice-Block.png");
-        enemyTex = LoadTexture("Resources/Enemy_01.png");
+        enemyTex01 = LoadTexture("Resources/Enemy_01.png");
+        enemyTex02 = LoadTexture("Resources/Player.png");
     }
 
     Sprite CreateSprite(Texture2D _texture, Rectangle _rect)

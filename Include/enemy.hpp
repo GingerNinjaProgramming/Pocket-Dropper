@@ -3,34 +3,38 @@
 #include "raylib.h"
 #include "spriteUtils.hpp"
 #include "player.hpp"
+#include "enum.hpp"
 #include <vector>
 
 namespace Enemys {
     struct Enemy {
         SpriteUtils::Sprite body;
         int heath;
-        int moveDirX = 5;
+        int moveSpeed = 5;
         int spawnRadius;
         int id = -1;
+        EnemyType type;
 
         Enemy() : body(SpriteUtils::Sprite{Texture2D{0}, {0,0}}) {
             this->heath = 0;
             this->spawnRadius = 10;
             this->id = -1;
-            this->moveDirX = 0;
+            this->moveSpeed = 0;
+            this->type = EnemyType::Platform;
         }
 
-        Enemy(int heath, Texture2D sprite,Vector2 postion, int spawnRadius = 10, int collisionBoxYOffset = 0) : body(sprite,postion,collisionBoxYOffset) {
+        Enemy(EnemyType enemyType,int heath, Texture2D sprite,Vector2 postion, int spawnRadius = 10, int collisionBoxYOffset = 0) : body(sprite,postion,collisionBoxYOffset) {
             this->spawnRadius = spawnRadius;
             this->heath = heath;
+            this->type = enemyType;
         }
 
         bool operator==(const Enemy& other) const {
             return body == other.body &&
                    heath == other.heath &&
-                   moveDirX == other.moveDirX &&
+                   moveSpeed == other.moveSpeed &&
                    spawnRadius == other.spawnRadius &&
-                   id == other.id;
+                   id == other.id && type == other.type;
         }
 
     };
@@ -40,7 +44,7 @@ namespace Enemys {
     void CreateEnemy(int heath, Texture2D sprite,Vector2 postion, int spawnRadius = 10, int collisionBoxYOffset = 0);
     void CreateEnemyFromStruct(Enemy enemy);
 
-    void UpdateEnemies();
+    void UpdateEnemies(PlayerUtils::Player &player);
 
     void HandleAllEnemyCollision(PlayerUtils::Player &player);
 
