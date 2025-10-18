@@ -15,4 +15,13 @@ enum EnemyType {
     Platform,
     Chaser
 };
+
+enum PlayerState {
+    Idle,
+    Falling,
+    Landed,
+    Jumping,
+    Moving_L,
+    Moving_R
+};
 #endif

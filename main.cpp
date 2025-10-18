@@ -14,6 +14,7 @@
 #include "backdrop.hpp"
 #include "enum.hpp"
 #include "weapon.hpp"
+#include "raylib-aseprite.h"
 
 PlayerUtils::Player player;
 int score;
@@ -80,7 +81,6 @@ void HandlePlayingLoop(Camera2D &camera, int frameCounter, Texture2D ice, Enemys
     Enemys::UpdateEnemies(player);
     PlatformUtils::HandlePlatformDespawn(camera);
 
-    std::cout << PlatformUtils::platforms.size() << std::endl;
 
     // Start drawing and apply camera transform
     BeginDrawing();
@@ -101,7 +101,7 @@ int main(){
 
     GameState gameState = Playing;
     Camera2D camera = { 0 };
-    player = PlayerUtils::CreatePlayer(200,200,10);
+    player = PlayerUtils::CreatePlayer(LoadAseprite("Resources/asprite/LittleDude.aseprite"),200,200,10);
 
     camera.offset = { SCREEN_WIDTH/2.0f, SCREEN_HEIGHT/2.0f };
     camera.rotation = 0.0f;

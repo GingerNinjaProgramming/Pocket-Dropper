@@ -3,6 +3,7 @@
 
 #include <raylib.h>
 #include <vector>
+#include "raylib-aseprite.h"
 
 namespace SpriteUtils {
 
@@ -42,13 +43,47 @@ namespace SpriteUtils {
         }
     };
 
+    /// Extended AsepriteTag struct with frame amount for easier animation handling
+    struct AsepriteTagEX {
+        AsepriteTag baseTag;
+        int frameAmount;
+        bool requireAnimationComplete = false;
+
+        AsepriteTagEX() {
+            this->baseTag = AsepriteTag{};
+            this->frameAmount = 0;
+            this->requireAnimationComplete = false;
+        }
+
+        AsepriteTagEX (AsepriteTag _tag, bool requireAnimationComplete = false) {
+            this->baseTag = _tag;
+            ase_tag_t* tagData = _tag.tag;
+            this->frameAmount = (tagData->to_frame - tagData->from_frame) + 1;
+            this->requireAnimationComplete = requireAnimationComplete;
+
+            if (requireAnimationComplete) {
+                baseTag.loop = false;
+            }
+        }
+
+        bool IsAnimComplete() {
+            return (baseTag.currentFrame - baseTag.tag->from_frame) + 1 >= frameAmount;
+        }
+    };
+
     void InitalizeTextures();
 
     Sprite CreateSprite(Texture2D _texture, Rectangle _rect);
 
     SpriteSheet CreateSpriteSheet(Texture2D sheet, int frameCount, int timeBetweenFrames);
 
+    AsepriteTagEX CreateAsepriteTagEX(Aseprite aseprite, const char* name, bool requireAnimationComplete = false);
+
     void DrawSpriteFrame(SpriteSheet &spriteSheet, Vector2 position);
+
+    ///Modifyied version of DrawAsepriteTagEX with extra params to ensure the sprite is on center
+    void DrawAsepriteTagOffset(AsepriteTag tag, Vector2 position, float rotation, float scale, Color tint);
+
 }
 
 #endif 

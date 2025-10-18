@@ -1,5 +1,7 @@
 #include "raylib.h"
 #include "spriteUtils.hpp"
+#include "raymath.h"
+#include  <iostream>
 
 namespace SpriteUtils {
 
@@ -39,6 +41,10 @@ namespace SpriteUtils {
         return spriteSheet;
     }
 
+    AsepriteTagEX CreateAsepriteTagEX(Aseprite aseprite, const char *name, bool requireAnimationComplete) {
+        return {LoadAsepriteTag(aseprite, name), requireAnimationComplete};
+    }
+
     void DrawSpriteFrame(SpriteSheet &spriteSheet, Vector2 position){
 
         Rectangle currentRec = spriteSheet.frames[spriteSheet.currentFrame];
@@ -60,7 +66,17 @@ namespace SpriteUtils {
         if(spriteSheet.currentFrame >= spriteSheet.frames.size()){
             spriteSheet.currentFrame = 0;
         }
-
     }
+
+    void DrawAsepriteTagOffset(AsepriteTag tag, Vector2 position,  float rotation, float scale, Color tint) {
+        Vector2 offset{
+            static_cast<float>(tag.aseprite.ase->w / 2) * scale,
+            static_cast<float>(tag.aseprite.ase->h) * scale - 10
+        };
+        position -= offset;
+
+        DrawAsepriteTagEx(tag, position,0,scale, tint);
+    }
+
 }
 

@@ -1,16 +1,17 @@
 #include "player.hpp"
 #include "constants.hpp"
 #include "platform.hpp"
+#include "raylib-aseprite.h"
 #include "weapon.hpp"
 #include "raymath.h"
 #include <raylib.h>
 #include <iostream>
 
 namespace PlayerUtils {
-    Player player;
-
-    Player CreatePlayer(float spawnX,float spawnY, float spawnRadius) {
-        return { spawnX, spawnY, spawnRadius};
+    Player CreatePlayer(Aseprite sprite,float spawnX,float spawnY, float spawnRadius) {
+        Player player(sprite, spawnX, spawnY, spawnRadius);
+        player.currentAnimation = SpriteUtils::CreateAsepriteTagEX(player.sprite, player.GetStateAsChar(),player.DoesAnimationRequireCompletion());
+        return player;
     }
 
     void HandleFloorCollision(Player &player) {
@@ -48,7 +49,7 @@ namespace PlayerUtils {
             if (CheckCollisionRecs(checkRect, enemy->body.AsRect())){
                 //Collision should of happened but didnt
                 PlayerUtils::HandleFloorCollision(player); //Run regular collision code
-                player.y = enemy->body.position.y - player.spawnRadius; //Put player ontop of collided platform
+                player.y = enemy->body.AsRect().y - player.spawnRadius; //Put player ontop of collided platform
                 std::cout << "Collision missed" << std::endl;
                 return; //Collision has been found
             }
@@ -62,7 +63,52 @@ namespace PlayerUtils {
         player.movementVelocity.x *= 1.25;
     }
 
+    void HandlePlayerState(Player &player) {
+        if (!player.isTouchingGround) {
+            //Player is in the air
+            if (player.isFalling) {
+                //Player is falling in air
+                player.ChangeState(PlayerState::Falling);
+                return;
+            }
+
+            //Player is going up in air
+            player.ChangeState(PlayerState::Jumping);
+            return;
+        }
+
+        //Player is on the ground
+        if (player.currentState == PlayerState::Falling) {
+            //Player has just landed
+            player.ChangeState(PlayerState::Landed);
+            return;
+        }
+
+        if (player.currentState == PlayerState::Landed) {
+            //Player has landed and is now idle
+            player.ChangeState(PlayerState::Idle);
+            return;
+        }
+
+        if (player.movementVelocity.x > 0) {
+            //Player is moving on ground to the right
+            player.ChangeState(PlayerState::Moving_R);
+            return;
+        }
+
+        if (player.movementVelocity.x < 0) {
+            //Player is moving on ground to the left
+            player.ChangeState(PlayerState::Moving_L);
+            return;
+        }
+
+        //Player is idle on ground
+        player.ChangeState(PlayerState::Idle);
+    }
+
+
     void UpdatePlayer(Player &player){
+        UpdateAsepriteTag(&player.currentAnimation.baseTag);
         Vector2 previousPos(player.x,player.y);
 
         if (!player.isTouchingGround && player.movementVelocity.y >= 0) {
@@ -79,12 +125,17 @@ namespace PlayerUtils {
         player.y += player.movementVelocity.y;
 
         HandleMissedCollision(player, previousPos);
+        HandlePlayerState(player);
 
         player.movementVelocity.x *= (float)player.currentFriction / 10;
+
     }
 
     void DrawPlayer(const Player &player) {
-        DrawCircle((int)player.x, (int)player.y, player.spawnRadius, RED);
+        BeginBlendMode(BLEND_ALPHA);
+        SpriteUtils::DrawAsepriteTagOffset(player.currentAnimation.baseTag, {(int)player.x, (int)player.y},0,8.0f, WHITE);
+        //DrawCircle((int)player.x, (int)player.y, player.spawnRadius, RED);
+        EndBlendMode();
         DrawCircleLines((int)player.x, (int)player.y, player.spawnRadius, GREEN);
     }
 }
