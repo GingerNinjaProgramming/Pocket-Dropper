@@ -64,9 +64,11 @@ namespace PlayerUtils {
     }
 
     void HandlePlayerState(Player &player) {
+        std::cout << player.movementVelocity.y << std::endl;
+
         if (!player.isTouchingGround) {
             //Player is in the air
-            if (player.isFalling) {
+            if (player.isFalling && player.timeFallingDown >= 0.125f) {
                 //Player is falling in air
                 player.ChangeState(PlayerState::Falling);
                 return;
@@ -128,6 +130,11 @@ namespace PlayerUtils {
         HandlePlayerState(player);
 
         player.movementVelocity.x *= (float)player.currentFriction / 10;
+
+        //Works to ensure that it clamps at zero for purposes of some checks
+        if (abs (player.movementVelocity.x) < 0.1f) {
+            player.movementVelocity.x = 0;
+        }
 
     }
 

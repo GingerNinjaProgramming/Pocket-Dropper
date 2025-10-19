@@ -15,6 +15,7 @@
 #include "enum.hpp"
 #include "weapon.hpp"
 #include "raylib-aseprite.h"
+#include "raygui.h"
 
 PlayerUtils::Player player;
 int score;
@@ -32,7 +33,7 @@ void DrawBackdrop(BackgroundElements::Backdrop &backdrop, const PlayerUtils::Pla
     DrawTexture(backdrop.texture, 0, backdrop.position.y  + backdrop.texture.height, WHITE);
 }
 
-void HandlePlayingLoop(Camera2D &camera, int frameCounter, Texture2D ice, Enemys::Enemy enemys[], BackgroundElements::Backdrop &backdrop) {
+void HandlePlayingLoop(Camera2D &camera, int frameCounter, Texture2D ice, Enemys::Enemy enemys[], BackgroundElements::Backdrop &backdrop, Music &bgm) {
     // Update camera target to player's world position so the camera follows the player
     camera.target = { SCREEN_WIDTH / 2, player.y - player.movementVelocity.y };
 
@@ -74,7 +75,7 @@ void HandlePlayingLoop(Camera2D &camera, int frameCounter, Texture2D ice, Enemys
         }
     }
 
-
+    UpdateMusicStream(bgm);
     Enemys::HandleAllEnemyCollision(player);
     PlayerUtils::UpdatePlayer(player);
     WeaponUtils::UpdateBullets();
@@ -96,8 +97,14 @@ void HandlePlayingLoop(Camera2D &camera, int frameCounter, Texture2D ice, Enemys
 }
 
 int main(){
-    InitWindow(SCREEN_WIDTH,SCREEN_HEIGHT,"Drop");
+    InitWindow(ACTUAL_SCREEN_WIDTH,SCREEN_HEIGHT,"Drop");
     SetTargetFPS(TARGET_FPS);
+
+    //Load background music
+    InitAudioDevice();
+    Music bgm = LoadMusicStream("Resources/music/Pixel Peeker Polka - faster.mp3");
+    SetMusicVolume(bgm,0.5f);
+    PlayMusicStream(bgm);
 
     GameState gameState = Playing;
     Camera2D camera = { 0 };
@@ -139,13 +146,21 @@ int main(){
     while(!WindowShouldClose()){
         switch (gameState) {
             case Playing:
-                HandlePlayingLoop(camera, frameCounter, SpriteUtils::ice, enemys, backdrop);
-                if (IsKeyDown(KEY_P)) gameState = Paused;
+                if (IsKeyDown(KEY_P)) {
+                    gameState = Paused;
+                    PauseMusicStream(bgm);
+                    break;
+                }
+                HandlePlayingLoop(camera, frameCounter, SpriteUtils::ice, enemys, backdrop,bgm);
                 break;
             case Paused:
                 BeginDrawing();
                 ClearBackground(RAYWHITE);
                 BeginMode2D(camera);
+                    DrawBackdrop(backdrop, player, camera);
+                    PlatformUtils::DrawPlatformsOnScreen(player, camera);
+                    PlayerUtils::DrawPlayer(player);
+                    Enemys::DrawEnemiesOnScreen();
                     DrawText("Wow what a cool piece of pausing you did there well done champ", 100,100,20,BLACK);
                 EndMode2D();
                 EndDrawing();
