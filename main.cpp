@@ -97,7 +97,7 @@ void HandlePlayingLoop(Camera2D &camera, int frameCounter, Texture2D ice, Enemys
 }
 
 int main(){
-    InitWindow(ACTUAL_SCREEN_WIDTH,SCREEN_HEIGHT,"Drop");
+    InitWindow(SCREEN_WIDTH,SCREEN_HEIGHT,"Drop");
     SetTargetFPS(TARGET_FPS);
 
     //Load background music

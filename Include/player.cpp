@@ -64,8 +64,6 @@ namespace PlayerUtils {
     }
 
     void HandlePlayerState(Player &player) {
-        std::cout << player.movementVelocity.y << std::endl;
-
         if (!player.isTouchingGround) {
             //Player is in the air
             if (player.isFalling && player.timeFallingDown >= 0.125f) {

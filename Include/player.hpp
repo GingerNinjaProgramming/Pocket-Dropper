@@ -65,13 +65,13 @@ namespace PlayerUtils {
                     std::cout << "True" << std::endl;
                     currentAnimation = newAnimation;
                     newAnimation = SpriteUtils::AsepriteTagEX{};
-                    return;
                 }
-
                 newAnimation = SpriteUtils::CreateAsepriteTagEX(sprite, GetStateAsChar(),DoesAnimationRequireCompletion());
             }else {
                 currentAnimation = SpriteUtils::CreateAsepriteTagEX(sprite, GetStateAsChar(),DoesAnimationRequireCompletion());
             }
+
+            //currentAnimation = SpriteUtils::CreateAsepriteTagEX(sprite, "Falling_Start",false);
         }
 
         char* GetStateAsChar() const{
