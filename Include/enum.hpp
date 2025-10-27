@@ -29,6 +29,7 @@ enum PlayerState {
 enum SoundType {
     PlayerHit,
     EnemyHit,
+    PlayerJump,
     PlayerLand,
     PlayerShoot,
     EnemyDeath

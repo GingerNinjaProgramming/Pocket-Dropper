@@ -60,6 +60,12 @@ namespace PlayerUtils {
         }
     }
 
+    void DoJump(Player &player) {
+        Sounds::PlaySound(SoundType::PlayerJump);
+        player.movementVelocity.y -= player.jumpHeight;
+    }
+
+
     void FireBullet(Player &player) {
         WeaponUtils::CreateBullet(SpriteUtils::ice, player);
         Sounds::PlaySound(SoundType::PlayerShoot);

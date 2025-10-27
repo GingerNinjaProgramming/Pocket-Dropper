@@ -109,6 +109,8 @@ namespace PlayerUtils {
 
     void HandleFloorCollision(Player &player);
 
+    void DoJump(Player &player);
+
     void FireBullet(Player &player);
 
     void DrawPlayer(const Player &player);

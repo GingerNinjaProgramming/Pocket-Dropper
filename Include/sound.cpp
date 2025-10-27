@@ -14,8 +14,9 @@
 namespace Sounds {
     std::unordered_map<SoundType, SoundCollection> loadedSounds;
 
-    void LoadSound(char* filePath, SoundType type) {
+    void LoadSound(char* filePath, SoundType type, float volume) {
         Sound sound = ::LoadSound(filePath);
+        SetSoundVolume(sound, volume);
 
         if (loadedSounds.contains(type)) {
             SoundCollection cur = loadedSounds[type];

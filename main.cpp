@@ -57,7 +57,7 @@ void HandlePlayingLoop(Camera2D &camera, int frameCounter, Texture2D ice, Enemys
     if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) player.movementVelocity.x = 5;
 
     if (IsKeyPressed(KEY_SPACE)) {
-        if (player.CanJump()) player.movementVelocity.y -= player.jumpHeight;
+        if (player.CanJump()) PlayerUtils::DoJump(player);
         else PlayerUtils::FireBullet(player);
     };
 
@@ -111,9 +111,12 @@ int main(){
     //Load background music
     InitAudioDevice();
     Music bgm = LoadMusicStream("Resources/music/Pixel Peeker Polka - faster.mp3");
-    SetMusicVolume(bgm,0.25f);
+    SetMusicVolume(bgm,0.1f);
     if (options.isSoundOn) PlayMusicStream(bgm);
 
+    Sounds::LoadSound("Resources/sfx/playerJump.wav", SoundType::PlayerJump, 0.5);
+    Sounds::LoadSound("Resources/sfx/playerJump02.wav", SoundType::PlayerJump, 0.5);
+    Sounds::LoadSound("Resources/sfx/playerJump03.wav", SoundType::PlayerJump, 0.5);
     Sounds::LoadSound("Resources/sfx/groundHit.wav", SoundType::PlayerLand);
     Sounds::LoadSound("Resources/sfx/groundHit02.wav", SoundType::PlayerLand);
     Sounds::LoadSound("Resources/sfx/enemyHit.wav", SoundType::EnemyHit);

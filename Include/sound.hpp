@@ -38,7 +38,7 @@ namespace Sounds {
     };
 
 
-    void LoadSound(char* filePath, SoundType type);
+    void LoadSound(char* filePath, SoundType type, float volume = 1);
 
     void PlaySound(SoundType sound);
 
