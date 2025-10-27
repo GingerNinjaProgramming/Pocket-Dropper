@@ -1057,6 +1057,16 @@ typedef enum {
 #include <stdarg.h>             // Required for: va_list, va_start(), vfprintf(), va_end() [TextFormat()]
 #include <math.h>               // Required for: roundf() [GuiColorPicker()]
 
+static float TextToFloat(const char *text)
+{
+    if (text == NULL) return 0.0f;
+    float value = 0.0f;
+    // sscanf returns 1 on successful parse
+    if (sscanf(text, "%f", &value) == 1) return value;
+    return 0.0f;
+}
+
+
 // Allow custom memory allocators
 #if defined(RAYGUI_MALLOC) || defined(RAYGUI_CALLOC) || defined(RAYGUI_FREE)
     #if !defined(RAYGUI_MALLOC) || !defined(RAYGUI_CALLOC) || !defined(RAYGUI_FREE)

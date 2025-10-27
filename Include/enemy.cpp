@@ -5,6 +5,7 @@
 #include "constants.hpp"
 #include "player.hpp"
 #include "enum.hpp"
+#include "sound.hpp"
 
 namespace Enemys {
     std::vector<Enemy*> enemys;
@@ -23,6 +24,7 @@ namespace Enemys {
     void DestroyEnemy(Enemy* enemy) {
         for (size_t i = 0; i < enemys.size(); i++) {
             if (enemys[i]->id == enemy->id) {
+                Sounds::PlaySound(SoundType::EnemyDeath);
                 enemys.erase(enemys.begin() + i);
                 delete enemy;
                 break;

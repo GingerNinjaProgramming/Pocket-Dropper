@@ -8,7 +8,8 @@ enum FrictionLevel{
 
 enum GameState {
     Playing,
-    Paused
+    Paused,
+    Options
 };
 
 enum EnemyType {
@@ -23,5 +24,13 @@ enum PlayerState {
     Jumping,
     Moving_L,
     Moving_R
+};
+
+enum SoundType {
+    PlayerHit,
+    EnemyHit,
+    PlayerLand,
+    PlayerShoot,
+    EnemyDeath
 };
 #endif

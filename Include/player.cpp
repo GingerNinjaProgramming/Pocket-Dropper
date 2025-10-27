@@ -7,6 +7,8 @@
 #include <raylib.h>
 #include <iostream>
 
+#include "sound.hpp"
+
 namespace PlayerUtils {
     Player CreatePlayer(Aseprite sprite,float spawnX,float spawnY, float spawnRadius) {
         Player player(sprite, spawnX, spawnY, spawnRadius);
@@ -18,6 +20,8 @@ namespace PlayerUtils {
         if (player.isTouchingGround) {
             return;
         }
+
+        Sounds::PlaySound(SoundType::PlayerLand);
 
         player.isTouchingGround = true;
         player.isFalling = false;
@@ -57,7 +61,8 @@ namespace PlayerUtils {
     }
 
     void FireBullet(Player &player) {
-        WeaponUtils::CreateBullet(SpriteUtils::ice, player );
+        WeaponUtils::CreateBullet(SpriteUtils::ice, player);
+        Sounds::PlaySound(SoundType::PlayerShoot);
 
         player.movementVelocity.y = -(10);
         player.movementVelocity.x *= 1.25;

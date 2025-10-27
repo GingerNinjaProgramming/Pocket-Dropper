@@ -11,14 +11,19 @@
 #include "enemy.hpp"
 #include "constants.hpp"
 #include "platform.hpp"
-#include "backdrop.hpp"
+#include "UI.hpp"
 #include "enum.hpp"
 #include "weapon.hpp"
 #include "raylib-aseprite.h"
 #include "raygui.h"
+#include "sound.hpp"
 
 PlayerUtils::Player player;
 int score;
+
+struct GameOptions {
+    bool isSoundOn = true;
+};
 
 void ClampRef(float &value, float min, float max) {
     value = Clamp(value, min, max);
@@ -97,14 +102,23 @@ void HandlePlayingLoop(Camera2D &camera, int frameCounter, Texture2D ice, Enemys
 }
 
 int main(){
+    GameOptions options;
+
     InitWindow(SCREEN_WIDTH,SCREEN_HEIGHT,"Drop");
     SetTargetFPS(TARGET_FPS);
+
 
     //Load background music
     InitAudioDevice();
     Music bgm = LoadMusicStream("Resources/music/Pixel Peeker Polka - faster.mp3");
-    SetMusicVolume(bgm,0.5f);
-    PlayMusicStream(bgm);
+    SetMusicVolume(bgm,0.25f);
+    if (options.isSoundOn) PlayMusicStream(bgm);
+
+    Sounds::LoadSound("Resources/sfx/groundHit.wav", SoundType::PlayerLand);
+    Sounds::LoadSound("Resources/sfx/groundHit02.wav", SoundType::PlayerLand);
+    Sounds::LoadSound("Resources/sfx/enemyHit.wav", SoundType::EnemyHit);
+    Sounds::LoadSound("Resources/sfx/explosion.wav", SoundType::EnemyDeath);
+    Sounds::LoadSound("Resources/sfx/gunFire.wav", SoundType::PlayerShoot);
 
     GameState gameState = Playing;
     Camera2D camera = { 0 };
@@ -154,6 +168,11 @@ int main(){
                 HandlePlayingLoop(camera, frameCounter, SpriteUtils::ice, enemys, backdrop,bgm);
                 break;
             case Paused:
+                //Temp Menu Rect
+                int width = 350;
+                int height = 150;
+                Rectangle windowRect = BackgroundElements::GetCenterRectangleGUI(width, height);
+
                 BeginDrawing();
                 ClearBackground(RAYWHITE);
                 BeginMode2D(camera);
@@ -161,15 +180,25 @@ int main(){
                     PlatformUtils::DrawPlatformsOnScreen(player, camera);
                     PlayerUtils::DrawPlayer(player);
                     Enemys::DrawEnemiesOnScreen();
-                    DrawText("Wow what a cool piece of pausing you did there well done champ", 100,100,20,BLACK);
                 EndMode2D();
+
+                GuiWindowBox(windowRect,"Game Paused");
+                GuiButton({windowRect.x + ((windowRect.width / 4)),windowRect.y + (windowRect.height / 2), windowRect.width / 2, windowRect.height / 4},"Options")
+                ? gameState = GameState::Options : 0;
+
                 EndDrawing();
                 break;
+            /*case Options:
+                BeginDrawing();
+                ClearBackground(RAYWHITE);
+                EndDrawing();
+                break;*/
         }
 
     }
     
     UnloadTexture(SpriteUtils::background);
+    UnloadMusicStream(bgm);
     CloseWindow();
     return 0;
 }

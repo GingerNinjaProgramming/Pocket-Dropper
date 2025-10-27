@@ -1,7 +1,7 @@
-﻿
-#ifndef BACKDROP_HPP
-#define BACKDROP_HPP
+﻿#ifndef UI_HPP
+#define UI_HPP
 #include "raylib.h"
+#include "constants.hpp"
 
 namespace BackgroundElements {
     struct Backdrop {
@@ -13,6 +13,8 @@ namespace BackgroundElements {
             this->position = position;
         }
     };
+
+    Rectangle GetCenterRectangleGUI(int width, int height);
 }
 
 #endif
