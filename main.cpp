@@ -44,7 +44,7 @@ void HandlePlayingLoop(Camera2D &camera, int frameCounter, Texture2D ice, Enemys
 
     Vector2 topLeftWorld = GetScreenToWorld2D({ 0, 0 }, camera);
 
-    PlatformUtils::SummonPlatform(ice,player, camera, FrictionLevel::Slippery,GetRandomValue(0,10) > 7 ? enemys[0] : Enemys::Enemy{});
+    PlatformUtils::SummonPlatform(ice,player, camera, FrictionLevel::Slippery,GetRandomValue(0,10) > 7 ? enemys[GetRandomValue(0,1)] : Enemys::Enemy{});
 
     frameCounter++;
 

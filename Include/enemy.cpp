@@ -1,11 +1,10 @@
 ﻿#include "enemy.hpp"
-
-#include <cmath>
-
 #include "constants.hpp"
 #include "player.hpp"
 #include "enum.hpp"
 #include "sound.hpp"
+#include "raymath.h"
+#include "node.h"
 
 namespace Enemys {
     std::vector<Enemy*> enemys;
@@ -32,22 +31,25 @@ namespace Enemys {
         }
     }
     void UpdateEnemy(Enemy &enemy, PlayerUtils::Player &player) {
+
         switch (enemy.type) {
             case EnemyType::Platform:
+                if (!enemy.isActive) return;
                 enemy.body.position.x += enemy.moveSpeed;
 
                 if (enemy.body.position.x < 0 + enemy.spawnRadius || enemy.body.position.x > SCREEN_WIDTH - enemy.spawnRadius) {
                     enemy.moveSpeed *= -1;
                 }
-
-                if (enemy.heath <= 0) {
-                    DestroyEnemy(&enemy);
-                }
-
                 break;
             case EnemyType::Chaser:
+                if (enemy.body.AsRect().y < player.y) {
+                    enemy.isActive = true;
+                }
+
+                if (!enemy.isActive) return;
+
                 float dx = player.x - enemy.body.position.x;
-                float dy = player.y - enemy.body.position.y;
+                float dy = Clamp(player.y - enemy.body.position.y,0,player.y - enemy.body.position.y);
                 float dist = sqrtf(dx*dx + dy*dy);
 
                 if (dist > 0.0001f) {
@@ -59,6 +61,10 @@ namespace Enemys {
                     }
                 }
                 break;
+        }
+
+        if (enemy.heath <= 0) {
+            DestroyEnemy(&enemy);
         }
     }
 

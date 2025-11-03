@@ -41,9 +41,19 @@ namespace PlatformUtils {
         Platform newPlatform = {SpriteUtils::CreateSprite(texture,potentialPlatform), (int)platforms.size() + 1,friction};
 
         if (potentialEnemy != Enemys::Enemy{}) {
-            potentialEnemy.body.position = {
-                SCREEN_WIDTH / 2, newPlatform.body.AsRect().y - (potentialEnemy.body.texture.height - 10)
-            };
+            switch (potentialEnemy.type) {
+                case EnemyType::Platform:
+                    potentialEnemy.body.position = {
+                        SCREEN_WIDTH / 2, newPlatform.body.AsRect().y - (potentialEnemy.body.texture.height - 10)
+                    };
+                case EnemyType::Chaser:
+                    Rectangle platformRect = newPlatform.body.AsRect();
+                    int enemyX = GetRandomValue(platformRect.x, platformRect.x + platformRect.width);
+                    int enemyY = platformRect.y + platformRect.height;
+
+                    potentialEnemy.body.position = {enemyX,enemyY};
+                    break;
+            }
 
             Enemys::CreateEnemyFromStruct(potentialEnemy);
         }

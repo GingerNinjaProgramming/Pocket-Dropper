@@ -14,6 +14,7 @@ namespace Enemys {
         int spawnRadius;
         int id = -1;
         EnemyType type;
+        bool isActive = true;
 
         Enemy() : body(SpriteUtils::Sprite{Texture2D{0}, {0,0}}) {
             this->heath = 0;
@@ -27,6 +28,10 @@ namespace Enemys {
             this->spawnRadius = spawnRadius;
             this->heath = heath;
             this->type = enemyType;
+
+            if (type != EnemyType::Platform) {
+                isActive = false;
+            }
         }
 
         bool operator==(const Enemy& other) const {
