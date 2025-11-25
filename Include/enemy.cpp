@@ -25,6 +25,7 @@ namespace Enemys {
             if (enemys[i]->id == enemy->id) {
                 Sounds::PlaySound(SoundType::EnemyDeath);
                 enemys.erase(enemys.begin() + i);
+
                 delete enemy;
                 break;
             }
@@ -65,6 +66,7 @@ namespace Enemys {
 
         if (enemy.heath <= 0) {
             DestroyEnemy(&enemy);
+            player.score += 1;
         }
     }
 
@@ -91,7 +93,7 @@ namespace Enemys {
     void DrawEnemy(Enemy &enemy) {
         // DrawTexture(enemy.texture, (int)enemy.position.x,(int)enemy.position.y, WHITE);
         DrawTextureEx(enemy.body.texture, {(int)enemy.body.position.x,(int)enemy.body.position.y - 20},0,0.9, WHITE);
-        DrawRectangleLinesEx(enemy.body.AsRect(), 2, WHITE);
+       // DrawRectangleLinesEx(enemy.body.AsRect(), 2, WHITE);
         //DrawCircle((int)(enemy.position.x), (int)(enemy.position.y), (int)enemy.spawnRadius, BLUE);
     }
 

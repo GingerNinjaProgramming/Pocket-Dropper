@@ -17,6 +17,14 @@ if (NOT raylib_FOUND)
     FetchContent_MakeAvailable(raylib)
 endif()
 
+include(FetchContent)
+FetchContent_Declare(
+        json
+        GIT_REPOSITORY https://github.com/nlohmann/json.git
+        GIT_TAG v3.11.3
+)
+FetchContent_MakeAvailable(json)
+
 file(GLOB SOURCES "*.cpp" "Include/*.cpp" "Resources/*.png")
 
 add_executable(
@@ -29,6 +37,7 @@ add_custom_command(TARGET PocketDropper POST_BUILD
 )
 
 target_include_directories(PocketDropper PRIVATE . Include)
+target_link_libraries(PocketDropper PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(PocketDropper PRIVATE raylib)
 
 if (WIN32)

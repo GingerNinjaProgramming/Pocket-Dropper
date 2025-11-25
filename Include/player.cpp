@@ -152,7 +152,7 @@ namespace PlayerUtils {
         SpriteUtils::DrawAsepriteTagOffset(player.currentAnimation.baseTag, {(int)player.x, (int)player.y},0,8.0f, WHITE);
         //DrawCircle((int)player.x, (int)player.y, player.spawnRadius, RED);
         EndBlendMode();
-        DrawCircleLines((int)player.x, (int)player.y, player.spawnRadius, GREEN);
+       // DrawCircleLines((int)player.x, (int)player.y, player.spawnRadius, GREEN);
     }
 }
 

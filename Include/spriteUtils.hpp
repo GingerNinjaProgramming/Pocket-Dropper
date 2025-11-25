@@ -11,6 +11,7 @@ namespace SpriteUtils {
     extern Texture2D ice;
     extern Texture2D enemyTex01;
     extern Texture2D enemyTex02;
+    extern Texture2D mainMenu;
 
     struct SpriteSheet{
         Texture2D texture;

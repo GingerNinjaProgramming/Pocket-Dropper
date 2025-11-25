@@ -15,6 +15,7 @@ namespace PlayerUtils {
         Vector2 movementVelocity{0,1};
         int jumpHeight = 15;
         int weight = 20;
+        int score = 0;
 
         PlayerState currentState = PlayerState::Falling;
         SpriteUtils::AsepriteTagEX currentAnimation;

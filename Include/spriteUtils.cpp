@@ -9,12 +9,14 @@ namespace SpriteUtils {
     Texture2D ice;
     Texture2D enemyTex01;
     Texture2D enemyTex02;
+    Texture2D mainMenu;
 
     void InitalizeTextures() {
         background = LoadTexture("Resources/backDrop.png");
         ice = LoadTexture("Resources/Ice-Block.png");
         enemyTex01 = LoadTexture("Resources/Enemy_01.png");
         enemyTex02 = LoadTexture("Resources/Player.png");
+        mainMenu = LoadTexture("Resources/MainMenu.png");
     }
 
     Sprite CreateSprite(Texture2D _texture, Rectangle _rect)

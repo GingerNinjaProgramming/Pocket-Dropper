@@ -7,6 +7,8 @@ enum FrictionLevel{
 };
 
 enum GameState {
+    MainMenu,
+    Quit,
     Playing,
     Paused,
     Options
@@ -34,4 +36,10 @@ enum SoundType {
     PlayerShoot,
     EnemyDeath
 };
+
+enum UIType {
+    Button,
+    Checkbox
+};
+
 #endif
