@@ -151,6 +151,7 @@ int main(){
 
     bool isOpen = true;
     while(isOpen){
+        std::cout << "Hello" << std::endl;
         switch (gameState) {
             case MainMenu: {
                 beforeOptionsState = gameState;
