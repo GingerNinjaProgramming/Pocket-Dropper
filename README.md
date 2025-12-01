@@ -8,9 +8,9 @@ Student NO : 2500411
 
 Date: 5/12/2025
 
-[Repository Link]("(https://github.com/GingerNinjaProgramming/Pocket-Dropper)")
+[Repository Link](https://github.com/GingerNinjaProgramming/Pocket-Dropper)
 
-[Build Link]("")
+[Build Link](https://gingerprogrammer.itch.io/pocket-dropper)
 
 ### Project Outline
 
@@ -170,7 +170,9 @@ This project was my first time using C++ and it led to new discoveries about com
 - Qualitive and Quantitive 
 - Guided or non guided 
 
-When it came to user testing admittedly this is one of the weaker parts of my project but despite this I still have some user testing at the start of my project and nearer to the end of my development cycle. 
+When it came to user testing admittedly this is one of the weaker parts of my project but despite this I still have some user testing at the start of my project and nearer to the end of my development cycle. On a users first test a lot of differnt bugs and gameplay errors were mentioned as would be expected from a early test of a prototyped game. However for the most part though a lot of errors were mentioned there was a general concencuse from the people playing the game that they thought it had potential,"have legs" as worded on post play form. These tests were primarily guided mainly to explain the controls because though simple some players defualted to using arrow keys and proceeded to wonder why the game was not working so to allow them to actually play the game it was guided by the nature of me telling them what the controls were. This did help inform one change which is where I added Arrow key support for people who were using the arrow keys.
+
+[]-------------------------------------------
 
 ## Instructions to Install / Run
 
