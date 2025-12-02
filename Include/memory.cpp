@@ -1,7 +1,7 @@
 // cpp
 // File: `memory.cpp`
 //
-// Created by conne on 16/11/2025.
+// Created by https://github.com/GingerNinjaProgramming on 16/11/2025.
 //
 
 #include "memory.hpp"

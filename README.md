@@ -77,17 +77,11 @@ This research was helpful in my project as it helped inform me the basic functio
 
 ### Process
 
-Describe your technical and creative approach, including:
-
-* Planning, ideation, and iteration
-* Feedback received and how it was integrated
-* New tools, workflows, or systems explored
-
 When I was planning my project I wanted something that would be easy to make the basics of that would allow me to use different techniques while still allowing for relative scalability if that is in the cards.  
 
-Coming into this project I had a background of C# programming which is a language which focuses heavily on Object Orientated Principles (Clark, 2011) this meant that when it came to programming my project in C++ I attempted to replicate some of the same methodology and ideas that come from a OOP mind set along with picking up on some functional programming (Functional Programming Paradigm, 23:53:03+00:00). These principles both being described in **Design Patterns: Elements of Reusable Object-Oriented Software** (Design Patterns, 2025).
+Coming into this project I had a background of C# programming which is a language which focuses heavily on Object Orientated Principles (Clark, 2011) this meant that when it came to programming my project in C++ I attempted to replicate some of the same methodology and ideas that come from a OOP mind set along with picking up on some functional programming (Functional Programming Paradigm, 23:53:03+00:00). These principles both being described in**Design Patterns: Elements of Reusable Object-Oriented Software** (Design Patterns, 2025).
 
-I began my project development with the core functionality of the game, this being the dropping of the player. When starting out my development of my game I started coding it logically as a form of skydiving sim with the player perpetually falling with different obstacles randomly spawning requiring the player to move out of the way. This worked similar to logic of how outer wilds moving between planets works **(CITATION NEEDED)** where instead of moving the player it would move the world around the player instead giving the illusion of the player moving when in reality they have not moved an inch. Towards this I begun working on a physics system involving drag and terminal velocity to make this sky diving esc system fun to play with and begun working on this. However after a week of trying this I begun to relies that the current state of the game and the current idea of the games logic was not working as physics systems had a lot more complexities than i initially relzsed and I begun to notice making the game like this went against one of the cores of my planning which was a simple and easy to prototype base game so at this moment a week into my project I decided to pivot my games logic into a more conventionally design dropper where the player is infinity falling with mini randomly generated platforms and enemy's around for the player to dodge/eliminate. This works based on a basic falling mechanic where the player has both a vector2 for its location and a vector to define its velocity which is added to its location every frame, modifying these values is how player movement is managed in code. Therefore when the player is not on the platform a constantforce will be added to the players y force allowing for the player to fall and to allow for the player to fall quicker the longer they have been falling the movement force pushing down on the player upon the system recognizing the player is falling begins to use a more conventional approach using a combination of a constant gravity value, the players preset weight value, the players falling time and the frames delta time to allow for the player to slowly and exponentionaly speed up the longer they have been falling.
+I began my project development with the core functionality of the game, this being the dropping of the player. When starting out my development of my game I started coding it logically as a form of skydiving sim with the player perpetually falling with different obstacles randomly spawning requiring the player to move out of the way. This worked similar to logic of how outer wilds moving between planets works (The Making of Outer Wilds - Documentary, 2020) where instead of moving the player it would move the world around the player instead giving the illusion of the player moving when in reality they have not moved an inch. Towards this I begun working on a physics system involving drag and terminal velocity to make this sky diving esc system fun to play with and begun working on this. However after a week of trying this I begun to relies that the current state of the game and the current idea of the games logic was not working as physics systems had a lot more complexities than i initially relzsed and I begun to notice making the game like this went against one of the cores of my planning which was a simple and easy to prototype base game so at this moment a week into my project I decided to pivot my games logic into a more conventionally design dropper where the player is infinity falling with mini randomly generated platforms and enemy's around for the player to dodge/eliminate. This works based on a basic falling mechanic where the player has both a vector2 for its location and a vector to define its velocity which is added to its location every frame, modifying these values is how player movement is managed in code. Therefore when the player is not on the platform a constantforce will be added to the players y force allowing for the player to fall and to allow for the player to fall quicker the longer they have been falling the movement force pushing down on the player upon the system recognizing the player is falling begins to use a more conventional approach using a combination of a constant gravity value, the players preset weight value, the players falling time and the frames delta time to allow for the player to slowly and exponentionaly speed up the longer they have been falling.
 
 ```cpp
 void UpdatePlayer(Player &player){
@@ -164,15 +158,9 @@ This project was my first time using C++ and it led to new discoveries about com
 
 ### User Testing
 
-- Talk about how users felt on first test
-- Show data
-- Talk about second test / benchmark
-- Qualitive and Quantitive 
-- Guided or non guided 
+When it came to user testing admittedly this is one of the weaker parts of my project but despite this I still have some user testing at the start of my project and nearer to the end of my development cycle. On a users first test a lot of differnt bugs and gameplay errors were mentioned as would be expected from a early test of a prototyped game. However for the most part though a lot of errors were mentioned there was a general consensus from the people playing the game that they thought it had potential,"have legs" as worded on post play form. These tests were primarily guided mainly to explain the controls because though simple some players defualted to using arrow keys and proceeded to wonder why the game was not working so to allow them to actually play the game it was guided by the nature of me telling them what the controls were. This did help inform one change which is where I added Arrow key support for people who were using the arrow keys.
 
-When it came to user testing admittedly this is one of the weaker parts of my project but despite this I still have some user testing at the start of my project and nearer to the end of my development cycle. On a users first test a lot of differnt bugs and gameplay errors were mentioned as would be expected from a early test of a prototyped game. However for the most part though a lot of errors were mentioned there was a general concencuse from the people playing the game that they thought it had potential,"have legs" as worded on post play form. These tests were primarily guided mainly to explain the controls because though simple some players defualted to using arrow keys and proceeded to wonder why the game was not working so to allow them to actually play the game it was guided by the nature of me telling them what the controls were. This did help inform one change which is where I added Arrow key support for people who were using the arrow keys.
-
-[]-------------------------------------------
+For the second test I wanted to ensure primarily that there were no game ending bugs to ensure the game can actually be played without breaking at the first point of contact as this point development major changes were not viable and focusing on making sure the game was functioning is the best thing considering the time in the projects lifecycle and general scale. For the most part other than minor bugs my final main play tests went off well and gave valuable data on the game for further post-project work. 
 
 ## Instructions to Install / Run
 
@@ -184,7 +172,7 @@ Then run the **.exe** inside of the extracted Zip file
 
 ### Research Effectiveness 
 
-The research into downwell and C++/Raylib as a whole was very useful on the general approach to the game in the first place along with the actual programming work on raylib which aided in the early development of the game. Along with this the videos on raylib I watched proved mostly helpful in the development process. However admittedly some tutorials proved unhelpful as they were either too old to be applicable like with tutorials on the compiler (CITATION NEEDED) or the mechanics being shown/created were too spesfic to fit for the problem I had resulting in some wasted time going back and forwards though a video just to relise it was not what i needed anyway before making it myself.
+The research into downwell and C++/Raylib as a whole was very useful on the general approach to the game in the first place along with the actual programming work on raylib which aided in the early development of the game. Along with this the videos on raylib I watched proved mostly helpful in the development process. However admittedly some tutorials proved unhelpful as they were either too old to be applicable like with tutorials on the compiler (How To Use VS CODE for C++ | With CMake & Any Compiler, 2021) or the mechanics being shown/created were too spesfic to fit for the problem I had resulting in some wasted time going back and forwards though a video just to relise it was not what i needed anyway before making it myself.
 
 ### Positive analysis
 
@@ -198,7 +186,7 @@ On my more objective negative analysis, the game while functioning was not actua
 
 Next time Im going to try and focus more on early prototypes when working on the game giving more time on working on the games core mechanics and allowing time to make the core of the game fun to play before deep diving on making the code efficient. This would also further help solve my other problem as being able to generate good functioning prototypes as quick as possible as early as possible further helps gives me more user feedback which can then ensure a better project once I leave the prototyping phase. Along with this I think during my future projects I am going to try and consult more of my peers during development as I took a extremely independent mindset during the project which could of been to my projects determent especially in the fun department.
 
-As far as whats guiding my intrests for future projects I had a lot of fun building reuseable and good systems that can be used thoughout my project and possibly to be used in later projects, when working on more projects thoughout my studies I want to continue to build more systems like this and possibly at some point build full on plugins and libarys for things like raylib,unreal,etc (CITATION NEEDED)
+As far as whats guiding my intrests for future projects I had a lot of fun building reuseable and good systems that can be used thoughout my project and possibly to be used in later projects, when working on more projects thoughout my studies I want to continue to build more systems like this and possibly at some point build full on plugins and libarys for things like raylib,unreal,etc 
 
 ## Declared Assets
 
@@ -256,6 +244,11 @@ CLion Just Made Raylib Setup Too Easy (2025) Directed by Rambod Dev. At: https:/
 raylib - cheatsheet (s.d.) At: https://www.raylib.com (Accessed  25/11/2025).
 
 raylib (2025) In: Wikipedia. At: https://en.wikipedia.org/w/index.php?title=Raylib&oldid=1313652413 (Accessed  24/10/2025).
+
+The Making of Outer Wilds - Documentary (2020) Directed by /noclip. At: https://www.youtube.com/watch?v=LbY0mBXKKT0 (Accessed  02/12/2025).
+
+How To Use VS CODE for C++ | With CMake & Any Compiler (2021) Directed by Code, Tech, and Tutorials. At: https://www.youtube.com/watch?v=gGxi500Q5uE (Accessed  02/12/2025).
+
 
 
 ### Other
